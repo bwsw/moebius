@@ -10,3 +10,7 @@ Moebius uses well known and robust ZeroMQ library to implement transport. It use
 * 1 request - 1 response 
 * 1 request - N responses
 * 1 request - 0 responses
+
+## Architecture
+
+Moebius is single-threaded. It uses python generators to implement parallel processing of multiple clients. 
