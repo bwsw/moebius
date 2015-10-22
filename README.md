@@ -5,4 +5,8 @@ Moebius is inspired by Tornado web-server, which is high performance REST and We
 
 #0mq as transport
 
-Moebius uses well known and robust ZeroMQ library to implement transport. It uses DEALER-ROUTER 0mq pattern two implement two-way communication without specific limitations. Using DEALER-ROUTER pattern it's possible to implement either synchronous request-response communication or arbitrary request-response* (0 or more responses) communication.
+Moebius uses well known and robust ZeroMQ library to implement transport. It uses DEALER-ROUTER 0mq pattern to implement two-way communication without specific limitations. DEALER-ROUTER pattern allows to implement three types of communication:
+ 
+* 1 request - 1 response 
+* 1 request - N responses
+* 1 request - 0 responses
