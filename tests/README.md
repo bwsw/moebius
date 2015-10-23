@@ -27,7 +27,7 @@ Moebius allows to use two types of handlers:
 Python function shoud be used when You need just to do something right now and reply back to client. It could be expressed like written in example below:
 
 ```python
-class StartHandler(object):
+class FunctionHandler(object):
     @staticmethod
     def run(client, data):
         client.send('Hello, world')
@@ -37,6 +37,18 @@ Here is just class with one static method run which takes two arguments:
 1. client - connection to direct speach to peer and broadcast
 2. data - request payload, transferred to the server from client.
 
+Next, you could se generator handler which sends back to client 3000 messages.
 
+```python
 
+class GeneratorHandler(object):
+    @staticmethod
+    def run(client, data):
+        d = json.loads(data)
+        for i in range(30000):
+            client.send(Send %s to [%s]" % (i,  client.id))
+            yield
+```
+
+It's implemented as generator (not as function) because it should give another clients space to work. You could see _yield_ keyword in the loop which allows to return management to server and let another handlers to work and continue when server will give this handler next turn.
 
