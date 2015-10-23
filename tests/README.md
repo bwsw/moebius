@@ -80,6 +80,8 @@ What happens above? Quite easy - we are yielding here generator (moebius.utils.s
 
 Moebius understands when you return from your handler generator and places it in front of your method until it will be completed, so the picture looks like:
 
+Step                           | State
+----------------------------------------------------------------------------------------
 Before yield utils.sleep_async | Queue = SleepGeneratorHandler.run
 After yield  utils.sleep_async | Queue = utils.sleep_async, SleepGeneratorHandler.run
 After end of generator utils.sleep_async | Queue = SleepGeneratorHandler.run (next)
