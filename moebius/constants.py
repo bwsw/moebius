@@ -1,0 +1,3 @@
+STRATEGY_REPLACE = 'replace'
+STRATEGY_IGNORE = 'ignore'
+STRATEGY_QUEUE = 'queue'
