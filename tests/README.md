@@ -13,4 +13,6 @@ You could overcome this limitations using next techniques (for sort):
 
 Both these methods can be implemented in Moebius effectively using python *generators*. Next in this tutorial I'll explain how to do it.
 
-*NB:* To effectively use Moebius you should understand python [*generators*](https://wiki.python.org/moin/Generators).
+*NB:* To effectively use Moebius you should understand python [*generators*](https://wiki.python.org/moin/Generators) and able to write your own generators.
+
+Since Moebius is single-threaded this means that overall request bandwidth/second = 1/req-time, where req-time is average time request takes to succeed.
