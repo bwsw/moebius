@@ -4,6 +4,8 @@ Moebius is free, light 0mq-based Dealer-Router generic python server. It's devel
 
 Moebius is inspired by Tornado web-server, which is high performance REST and WebSocket server. Like Tornado, Moebius employs the approach with python generators to create light and single-threaded server.
 
+Name "Moebius" (Möbius) is choosen because of nature of programming handlers which are generators and could be run infinitely like "Möbius stripe".
+
 ## 0mq as transport
 
 Moebius uses well known and robust ZeroMQ library to implement transport. It uses DEALER-ROUTER 0mq pattern to implement two-way communication without specific limitations. DEALER-ROUTER pattern allows to implement three types of communication:
