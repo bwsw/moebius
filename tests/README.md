@@ -128,7 +128,7 @@ router = moebius.router.ZMQRouter(rules)
 
 ```
 
-If you would like to use non-JSON protocol or implement more complicated routing mechanism, You should derive your class from moebius.router.ZMQRouter and override process method:
+If you would like to use non-JSON protocol or implement more complicated routing mechanism, You should derive your class from [moebius.router.ZMQRouter](https://github.com/bwsw/moebius/blob/master/moebius/router.py) and override process method:
 
 ```python
 def process(self, **kwargs):
