@@ -24,6 +24,9 @@ Moebius is tested and works well under next GNU/Linux distributions:
 
 1. Ubuntu 14.04.3 LTS
 
+## Getting Started
+
+See tests directory for examples and Jump start.
 
 ## License
 
