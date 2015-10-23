@@ -44,7 +44,6 @@ Next, you could se generator handler which sends back to client 3000 messages.
 class GeneratorHandler(object):
     @staticmethod
     def run(client, data):
-        d = json.loads(data)
         for i in range(30000):
             client.send(Send %s to [%s]" % (i,  client.id))
             yield
@@ -52,3 +51,29 @@ class GeneratorHandler(object):
 
 It's implemented as generator (not as function) because it should give another clients space to work. You could see _yield_ keyword in the loop which allows to return management to server and let another handlers to work and continue when server will give this handler next turn.
 
+```python
+
+class GeneratorHandler(object):
+    @staticmethod
+    def run(client, data):
+        for i in range(30000):
+            client.send(Send %s to [%s]" % (i,  client.id))
+            yield
+```
+
+Let's move forward and learn how to implement non-blocking sleep using generator handler. Using non-blocking sleep you will be able to keep your handler as soon as possible until some event will occure. Here goes an example:
+
+```python
+
+import moebius.utils
+
+class SleepGeneratorHandler(object):
+    @staticmethod
+    def run(client, data):
+        d = json.loads(data)
+        for i in range(300):
+            client.send(Send %s to [%s]" % (i,  client.id))
+            yield utils.sleep_async(1)
+```
+
+What happens above? Quite easy - we are yielding here generator (moebius.utils.sleep_async is generator) and thus our method will send one message to client every 1 second and will give other clients to work. If you will use here standard python time.sleep(1) then until You will send 300 messages other clients will not able to communicate to server.
