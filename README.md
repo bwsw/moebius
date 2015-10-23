@@ -21,8 +21,6 @@ Moebius is licensed under Apache 2.0 license.
 
 ## Author
 
-Moebius is created at Bitworks Software, Ltd.
-
-www: http://bw-sw.com
+Moebius is created at [Bitworks Software, Ltd.](http://bw-sw.com)
 
 mailto: bitworks (at) bw-sw.com
