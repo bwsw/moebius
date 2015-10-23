@@ -119,3 +119,19 @@ rules = [
 ```
 
 Here routing decision is made on 'command' argument in JSON with some value (here, 'reply'). So, the rule above will call for handlers.ReplyHandler in queue strategy mode when it will get in request from client JSON with 'command' = 'reply'.
+
+Next, it's necessary to create router which will handle rules:
+
+```python
+
+router = moebius.router.ZMQRouter(rules)
+
+```
+
+If you would like to use non-JSON protocol or implement more complicated routing mechanism, You should derive your class from moebius.router.ZMQRouter and override process method:
+
+```python
+def process(self, **kwargs):
+```
+
+Server passes keyword argument "message" which holds 0mq message.
