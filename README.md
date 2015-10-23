@@ -18,3 +18,8 @@ Moebius is single-threaded. It uses python generators to implement parallel proc
 ## License
 
 Moebius is licensed under Apache 2.0 license.
+
+## Author
+
+Moebius is created at Bitworks Software, Ltd.
+www: http://bw-sw.com
