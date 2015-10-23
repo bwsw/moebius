@@ -102,3 +102,20 @@ In general one should use _queue_ strategy because it allows to handle all reque
 
 1. _Replace_ could be used when server will not responded in awaited timeframe and client sends new request because old one is already outdated;
 2. _Ignore_ could be used to deny new requests from client until server will respond to current request.
+
+## Defining Rules for Moebius
+
+Rules are managed by Routers. Default router is ZMQRouter, which assumes that data between client and server is JSON. It uses next format of rules:
+
+```python
+
+rules = [
+        {
+            'command': 'reply',
+            'handler': (moebius.constants.STRATEGY_QUEUE, handlers.ReplyHandler)
+        }, ...
+]
+
+```
+
+Here routing decision is made on 'command' argument in JSON with some value (here, 'reply'). So, the rule above will call for handlers.ReplyHandler in queue strategy mode when it will get in request from client JSON with 'command' = 'reply'.
