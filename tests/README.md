@@ -77,3 +77,11 @@ class SleepGeneratorHandler(object):
 ```
 
 What happens above? Quite easy - we are yielding here generator (moebius.utils.sleep_async is generator) and thus our method will send one message to client every 1 second and will give other clients to work. If you will use here standard python time.sleep(1) then until You will send 300 messages other clients will not able to communicate to server.
+
+Moebius understands when you return from your handler generator and places it in front of your method until it will be completed, so the picture looks like:
+
+- Before yield utils.sleep_async: Queue = SleepGeneratorHandler.run
+- After yield  utils.sleep_async: Queue = utils.sleep_async, SleepGeneratorHandler.run
+- After end of generator utils.sleep_async: Queue = SleepGeneratorHandler.run (next)
+
+So, yielding generators from generators we create stack of generators which should be completed one after another.
