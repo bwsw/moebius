@@ -17,6 +17,9 @@ Moebius is single-threaded. It uses python generators to implement parallel proc
 
 ## Dependencies
 
+1. Python 2.7+
+2. python-zmq library
+3. Tornado ioloop (Tornado framework installed)
 
 ## Platforms
 
