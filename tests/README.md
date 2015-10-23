@@ -12,3 +12,5 @@ You could overcome this limitations using next techniques (for sort):
 2. Complete offload to external service and just wait until it completes sorting.
 
 Both these methods can be implemented in Moebius effectively using python *generators*. Next in this tutorial I'll explain how to do it.
+
+*NB:* To effectively use Moebius you should understand python [*generators*](https://wiki.python.org/moin/Generators).
