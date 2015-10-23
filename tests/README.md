@@ -85,3 +85,8 @@ Moebius understands when you return from your handler generator and places it in
 - After end of generator utils.sleep_async: Queue = SleepGeneratorHandler.run (next)
 
 So, yielding generators from generators we create stack of generators which should be completed one after another.
+
+Now, we are familiar with the way to create handlers, let's introduce strategies.
+
+## Strategies of handling supported by Moebius
+
