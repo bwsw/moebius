@@ -11,3 +11,4 @@ You could overcome this limitations using next techniques (for sort):
 1. Split array on some parts and run sort for every part, do return management to server in order it could run another handlers and when server will return back management to this handler, continue to do sort of next part of array. Finally, You just merge sorted parts together.
 2. Complete offload to external service and just wait until it completes sorting.
 
+Both these methods can be implemented in Moebius effectively using python *generators*. Next in this tutorial I'll explain how to do it.
