@@ -134,4 +134,8 @@ If you would like to use non-JSON protocol or implement more complicated routing
 def process(self, **kwargs):
 ```
 
-Server passes keyword argument "message" which holds 0mq message.
+Server passes keyword argument "message" which holds 0mq message. If your implementation unable to route some message, you can raise exception:
+
+```python
+raise RouterProcessingError(msg)
+```
