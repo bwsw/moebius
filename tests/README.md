@@ -90,3 +90,9 @@ Now, we are familiar with the way to create handlers, let's introduce strategies
 
 ## Strategies of handling supported by Moebius
 
+Moebius supports 3 strategies which defines how new requests build queue of handlers. They are:
+
+1. replace (moebius.constants.STRATEGY_REPLACE) - replaces current handler for client if client sends new request;
+2. ignore (moebius.constants.STRATEGY_IGNORE) - ignores new requests from client if handler for that client is not yet completed;
+3. queue (moebius.constants.STRATEGY_QUEUE) - appends new handler to the tail of current handler, so it will be run after current handler completed.
+ 
