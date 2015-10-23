@@ -18,3 +18,25 @@ Both these methods can be implemented in Moebius effectively using python *gener
 *Since Moebius is single-threaded this means that overall request bandwidth/second = 1/req-time, where req-time is average time request takes to succeed.*
 
 ## Handlers available
+
+Moebius allows to use two types of handlers:
+
+1. Python function handler
+2. Python-generator handler
+
+Python function shoud be used when You need just to do something right now and reply back to client. It could be expressed like written in example below:
+
+```python
+class StartHandler(object):
+    @staticmethod
+    def run(client, data):
+        client.send('Hello, world')
+```
+
+Here is just class with one static method run which takes two arguments:
+1. client - connection to direct speach to peer and broadcast
+2. data - request payload, transferred to the server from client.
+
+
+
+
