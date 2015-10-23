@@ -32,7 +32,7 @@ Moebius is tested and works well under next GNU/Linux distributions:
 
 ## Getting Started
 
-See tests directory for examples and Jump start.
+See [tests](https://github.com/bwsw/moebius/tree/master/tests) directory for examples and Jump start.
 
 ## License
 
