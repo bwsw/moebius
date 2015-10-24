@@ -161,3 +161,7 @@ class ZMQRouter(object):
 ```
 
 So, just derive class from ZMQRouter and override process method.
+
+## Gathering all pieces in one place
+
+Let's develop simple client server "echo" application using Moebius.
