@@ -139,3 +139,25 @@ Server passes keyword argument "message" which holds 0mq message. If your implem
 ```python
 raise moebius.errors.RouterProcessingError(msg)
 ```
+
+Default router looks like shown below:
+
+```python
+
+import json
+from errors import *
+
+class ZMQRouter(object):
+    def __init__(self, rules):
+        self._rules = rules
+
+    def process(self, **kwargs):
+        data = json.loads(kwargs['message'])
+        for rule in self._rules:
+            if 'command' in data and data['command'] == rule['command']:
+                return rule['handler']
+        raise RouterProcessingError('Command not found')
+        
+```
+
+So, just derive class from ZMQRouter and override process method.
