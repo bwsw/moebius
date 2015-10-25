@@ -31,7 +31,7 @@ Moebius is single-threaded. It uses python generators to implement parallel proc
 Moebius is tested and works well under next GNU/Linux distributions:
 
 1. Ubuntu 14.04.3 LTS (all from repos)
-2. Debian 7 wheezy (libzmq3 from backports, python-zmq from pip - pip install pyzmq)
+2. [Debian 7 wheezy](https://github.com/bwsw/moebius/blob/master/tests/Debian7.md)
 
 ## Documentation
 
