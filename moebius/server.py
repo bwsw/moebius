@@ -13,9 +13,10 @@ class ZMQServer:
     _socket_ids = set()
     _connections = dict()
 
-    def __init__(self, address, router):
+    def __init__(self, address, router, poll_wait = 5):
         self._address = address
         self._router = router
+	self._poll_wait = poll_wait
 
     def _handle_request(self, connection):
         client, message = connection.process()
@@ -90,7 +91,7 @@ class ZMQServer:
                 if self._poll_forever:
                     sockets = dict(poller.poll())
                 else:
-                    sockets = dict(poller.poll(5))
+                    sockets = dict(poller.poll(self._poll_wait))
 
                 for socket in sockets:
                     if socket in sockets and sockets[socket] == zmq.POLLIN:

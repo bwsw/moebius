@@ -54,7 +54,7 @@ def start_server(port):
         }
     ]
     router = ZMQRouter(rules)
-    srv = ZMQServer('tcp://127.0.0.1:%s' % port, router)
+    srv = ZMQServer('tcp://127.0.0.1:%s' % port, router, 1)
     print 'Server started'
     srv.start()
 
