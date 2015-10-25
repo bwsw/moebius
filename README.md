@@ -1,6 +1,6 @@
 # Introduction
 
-Moebius is free, light 0mq-based Dealer-Router python server. It's developed to be run under GNU/Linux environment.
+Moebius is free, light [ZeroMQ](http://zeromq.org/)-based Dealer-Router python server. It's developed to be run under GNU/Linux environment.
 
 Moebius is inspired by Tornado web-server, which is high performance HTTP and WebSocket server. Like Tornado, Moebius employs the approach with python generators to create light and single-threaded server.
 
