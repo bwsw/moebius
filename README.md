@@ -37,6 +37,15 @@ Moebius is tested and works well under next GNU/Linux distributions:
 
 See [tests](https://github.com/bwsw/moebius/tree/master/tests) directory for examples and Jump start.
 
+## Performance
+
+There is tests/sync_req_rep_perf.py script which should run like:
+
+```bash
+$ python sync_req_rep_perf.py 12
+```
+from tests directory, which takes amount of concurrent synchronous clients to server, so 12 in the sample above.
+
 ## License
 
 Moebius is licensed under Apache 2.0 license.
