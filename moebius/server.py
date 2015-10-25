@@ -13,6 +13,7 @@ class ZMQServer:
     _socket_ids = set()
     _connections = dict()
 
+    
     def __init__(self, address, router, poll_wait = 5):
         self._address = address
         self._router = router
@@ -36,7 +37,7 @@ class ZMQServer:
                     self._poll_forever = False
             else:
                 if strategy == STRATEGY_REPLACE:
-                    del self._generator_dictionary[client.id]
+                    # del self._generator_dictionary[client.id]
                     self._generator_dictionary[client.id] = handler.run(client, message)
                 elif strategy == STRATEGY_QUEUE:
                     self._generator_dictionary[client.id] = itertools.chain(self._generator_dictionary[client.id],

@@ -6,9 +6,9 @@ Moebius is inspired by Tornado web-server, which is high performance HTTP and We
 
 Name "Moebius" (Möbius) is choosen because of nature of handlers which are python generators and could be run infinitely like "Möbius stripe".
 
-## 0mq as transport
+## ZeroMQ as transport
 
-Moebius uses well known and robust ZeroMQ library to implement transport. It uses DEALER-ROUTER 0mq pattern to implement two-way communication without specific limitations. DEALER-ROUTER pattern allows to implement three types of communication:
+Moebius uses well known and robust ZeroMQ (0mq) library to implement transport. It uses DEALER-ROUTER 0mq pattern to implement two-way communication without specific limitations. DEALER-ROUTER pattern allows to implement three types of communication:
  
 * 1 request - 1 response 
 * 1 request - N responses
