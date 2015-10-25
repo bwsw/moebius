@@ -36,7 +36,7 @@ class Timer(object):
 #-------------------------------------------------------------
 # specific client which is derived from basic REQ/REP client
 #
-class Client(utils.ZMQClient):
+class Client(utils.ReqRepClient):
     def send(self, message):
         super(Client, self).send(message=message)
 
