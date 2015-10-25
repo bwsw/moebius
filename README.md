@@ -33,7 +33,7 @@ Moebius is tested and works well under next GNU/Linux distributions:
 1. Ubuntu 14.04.3 LTS (all from repos)
 2. Debian 7 wheezy (libzmq3 from backports, python-zmq from pip - pip install pyzmq)
 
-## Getting Started
+## Documentation
 
 See [tests](https://github.com/bwsw/moebius/tree/master/tests) directory for examples and Jump start.
 
