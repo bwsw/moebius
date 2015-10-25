@@ -48,7 +48,7 @@ from tests directory, which takes argument (amount of concurrent synchronous cli
 
 Keep in mind, that Moebius is single-threaded so you should use HA-proxy, BalanceNG or similar software to distribute load and utilize all cores of your system.
 
-We have benchmarked Moebius on Intel(R) Xeon(R) CPU E3-1230 V2 @ 3.30GHz and it gives us about 22K q/s for 1 core, so for 4 cores You should take about 70-80K q/s.
+We have benchmarked Moebius on Intel(R) Xeon(R) CPU E3-1230 V2 @ 3.30GHz and it gives us about 22K q/s for 1 core, so for 4 cores (for Xeon E3) You should take about 70-80K q/s.
 
 ## License
 
