@@ -82,15 +82,22 @@ def start_sync_client_strategy(port, id):
 
 if __name__ == "__main__":
     port = 19876
+
+    cnt = 0
+    if len(sys.argv) > 1:
+        cnt = int(sys.argv[1])
+    if cnt <= 0:
+	cnt = 1
+
     s = multiprocessing.Process(target=start_server, args=(port,))
     s.start()
     child = []
 
-    for i in xrange(5):
+    for i in xrange(cnt):
         child.append(multiprocessing.Process(target=start_sync_client_strategy, args=(port, i,)))
 	child[i].start()
 
-    for i in xrange(5):
+    for i in xrange(cnt):
 	child[i].join()
 
     s.terminate()
