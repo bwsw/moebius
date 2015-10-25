@@ -18,7 +18,7 @@ def sleep_async(timeout):
 # define client to test req/rep pattern on DEALER/ROUTER
 # uses tornado ioloop
 # 
-class ZMQClient(object):
+class ReqRepClient(object):
     _socket = None
 
     def __init__(self, *args, **kwargs):
