@@ -52,7 +52,7 @@ We have benchmarked Moebius on Intel(R) Xeon(R) CPU E3-1230 V2 @ 3.30GHz and it 
 
 ## License
 
-Moebius is licensed under Apache 2.0 license.
+Moebius is licensed under [Apache 2.0 license](https://github.com/bwsw/moebius/blob/master/LICENSE).
 
 ## Author
 
