@@ -20,15 +20,18 @@ Moebius is single-threaded. It uses python generators to implement parallel proc
 
 ## Dependencies
 
-1. Python 2.7+
-2. python-zmq library
-3. Tornado ioloop (Tornado framework installed)
+1. Python 2.7+ (we didn't tested before 2.7)
+2. libzmq 4.0.4+
+3. python-zmq library
+4. Tornado ioloop (Tornado framework installed)
+
 
 ## Platforms
 
 Moebius is tested and works well under next GNU/Linux distributions:
 
-1. Ubuntu 14.04.3 LTS
+1. Ubuntu 14.04.3 LTS (all from repos)
+2. Debian 7 wheezy (libzmq3 from backports, python-zmq from pip - pip install pyzmq)
 
 ## Getting Started
 
