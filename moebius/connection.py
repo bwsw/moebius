@@ -41,6 +41,13 @@ class ZMQConnection(object):
 	    if filter_function(self._clients[client_id]):
         	self._clients[client_id].send(message)
 
+    def iterate(self, handler_function = None):
+	if handler_function == None:
+	    handler_function = lambda client: True
+        for client_id in self._clients:
+	    handler_function(self._clients[client_id])
+
+
     def close(self, client_id):
         if client_id in self._clients:
             del self._clients[client_id]
