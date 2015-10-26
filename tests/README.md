@@ -294,3 +294,34 @@ class TestServer(ZMQServer):
             yield timer(1)
 
 ```
+
+## ZeroMQ yielding dealer client
+
+To use effectively DEALER connections to remote ROUTERs (for eg. another Moebius instances) inside of Moebius handlers we have to use yielding client implementation which doesn't block Moebius server and gives effective way to serve another clients. There as moebius.utils.YieldingClient which solves this problem. Below an example of how to use it.
+
+```python
+
+class Client(utils.YieldingClient):
+    def send(self, message):
+        super(Client, self).send(message=message)
+
+
+class SomeHandler(object):
+    @staticmethod
+    def run(client, data):
+    	# open DEALER connection to remote ROUTER server
+	c = Client(address='tcp://127.0.0.1:%s' % port, identity='Client%s' % id)
+	# send message
+	c.send(message)
+	# wait nonblocking until we get response
+	yield c.wait_result_async()
+	# read response
+	data = c.recv()
+	# send response to our client
+	client.send(data)
+
+```
+
+So, magis is inside ```	yield c.wait_result_async()``` which takes care about nonblocking awaiting of response from remote executor. After it receives response You just read it using ```c.recv()```.
+
+Method ```YieldingClient.wait_result_async(timeout = None)``` allows to specify timeout argument to avoid infinite waiting for response.
