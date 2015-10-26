@@ -42,6 +42,14 @@ class ReplyHandler(object):
         client.send('Reply to %s' % client.id)
 
 
+class ReplyHandler2(object):
+    @staticmethod
+    def run(client, data):
+        random.seed()
+        yield sleep_async(5+random.randint(0,5))
+        client.send('Reply to %s' % client.id)
+
+
 class ReplyHandlerEchoNoWait(object):
     @staticmethod
     def run(client, data):

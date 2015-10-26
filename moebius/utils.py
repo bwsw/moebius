@@ -63,3 +63,60 @@ class ReqRepClient(object):
     @property
     def id(self):
         return self._identity
+
+
+
+
+
+
+
+#-------------------------------------------------------------------------------------------
+# define client to test req/rep pattern on DEALER/ROUTER
+# uses tornado ioloop
+# 
+class YieldingClient(object):
+    _socket = None
+
+    def __init__(self, *args, **kwargs):
+        self._address = kwargs['address']
+        self._socket_type = kwargs.pop('socket_type', zmq.DEALER)
+        self._identity = kwargs.pop('identity', None)
+	self._poller = zmq.Poller()
+
+
+    def connect(self):
+        context = zmq.Context()
+        self._socket = context.socket(zmq.DEALER)
+        if self._identity:
+            self._socket.setsockopt(zmq.IDENTITY, self._identity)
+
+        # ZMQ_PROBE_ROUTER
+        self._socket.setsockopt(51, 1)
+        self._socket.connect(self._address)
+	self._poller.register(self._socket, zmq.POLLIN)
+
+    def disconnect(self):
+        raise self._socket.close()
+
+    def send(self, message):
+        self._socket.send(message)
+
+    def wait_result_async(self,timeout = None):
+	t = time.time()
+	self._data = None
+	while (self._data is None) and ((timeout is None) or (time.time() - t < timeout)):
+		sockets = dict(self._poller.poll(0))
+		if len(sockets):
+			self._data = self._socket.recv()
+		if self._data is None:
+			yield
+
+    def recv(self):
+	if self._data:
+		return self._data
+	else:
+		return self._socket.recv()
+
+    @property
+    def id(self):
+        return self._identity
