@@ -242,3 +242,26 @@ if __name__ == "__main__":
     s.terminate()
 
 ```
+
+## Client broadcasting
+
+Moebius gives you a way to broadcast information to all or part of connected clients. To do it You can use
+
+```python
+
+def run(client, data):
+	client.broadcast(message)
+```
+
+to do broadcasting to all clients. Or use function filter to broadcast to subset of clients:
+
+```python
+
+def filter_broadcast(client):
+	if client.id == "Client1" or client.id == "Client2":
+		return True
+	return False
+
+def run(client, data):
+	client.broadcast(message, filter_broadcast)
+```
