@@ -265,3 +265,32 @@ def filter_broadcast(client):
 def run(client, data):
 	client.broadcast(message, filter_broadcast)
 ```
+
+## Background tasks
+
+Sometimes it's necessary to do some background activity even there are no requests. You can achieve this in Moebius defining and overriding "background" method:
+
+```python
+
+class TestServer(ZMQServer):
+    def background(self, connection):
+        while True:
+            connection.broadcast('ping')
+            yield timer(1)
+
+```
+
+This generator will be run during server start and will be triggered every server iteration. Generator takes "connection" object of "ZMQConnection" type and the only useful method of "connection" is "iterate" which allows You to pass handler and operate with every object, see next code block:
+
+```python
+
+def iterate_handler(client):
+	client.send("test")
+
+class TestServer(ZMQServer):
+    def background(self, connection):
+        while True:
+            connection.iterate(iterate_handler)
+            yield timer(1)
+
+```
