@@ -32,7 +32,7 @@ class ZMQConnection(object):
                 del self._clients[client_id]
             raise ConnectionSendError(e, client_id)
 
-    def multicast(self, message, filter_function = None):
+    def broadcast(self, message, filter_function = None):
 
 	if filter_function == None:
 	    filter_function = lambda client: True
@@ -62,8 +62,8 @@ class ZMQClient(object):
     def send(self, message):
         self._connection.send(self._client_id, message)
 
-    def multicast(self, message, filter_function = None):
-        self._connection.multicast(message, filter_function)
+    def broadcast(self, message, filter_function = None):
+        self._connection.broadcast(message, filter_function)
 
     def close(self):
         self._connection.close(self._client_id)

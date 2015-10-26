@@ -15,7 +15,7 @@ def timer(timeout):
 class TestServer(ZMQServer):
     def background(self, connection):
         while True:
-            connection.multicast('ping')
+            connection.broadcast('ping')
             yield timer(1)
 
 
