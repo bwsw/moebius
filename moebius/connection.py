@@ -38,7 +38,7 @@ class ZMQConnection(object):
 	    filter_function = lambda client: True
 
         for client_id in self._clients:
-	    if filter_function(client_id):
+	    if filter_function(self._clients[client_id]):
         	self._clients[client_id].send(message)
 
     def close(self, client_id):
