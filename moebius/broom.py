@@ -3,6 +3,8 @@ import types
 import os
 import time
 import multiprocessing
+import logging
+import random
 from constants import *
 from connection import ZMQConnection
 from server import ZMQServer
@@ -16,9 +18,12 @@ from utils import YieldingClient
 class BroomHandler(object):
 	@staticmethod
 	def run(client, data):
+		logging.debug("Entering BroomHandler.run")
 		broom = client.connection.server.broom
 		broom.run()
-		return broom.relay(client,data)
+		r = broom.relay(client,data)
+		logging.debug("Leaving BroomHandler.run")
+		return r
 
 #-------------------------------------------------------------
 # broom proxy router class. Always sends messages to BroomHandler
@@ -36,15 +41,24 @@ class BroomProxyRouter(ZMQRouter):
 class BroomClient(YieldingClient):
 
     def __init__(self, *args, **kwargs):
-	super(YieldingClient, self).__init__(*args,**kwargs)
+	logging.debug("Entering BroomClient.__init__")
+	super(BroomClient, self).__init__(*args,**kwargs)
 	self._client = kwargs['client']
+	logging.debug("Leaving BroomClient.__init__")
+
 
     def send(self, message):
-        super(YieldingClient, self).send(message=message)
+	logging.debug("Entering BroomClient.send")
+        super(BroomClient, self).send(message=message)
+	logging.debug("Leaving BroomClient.send")
+
 
     def on_wait_result_async(self):
-	super(YieldingClient, self).on_wait_result_async(self)
-	self._client.send(data)
+	logging.debug("Entering BroomClient.on_wait_result_async")
+	super(BroomClient, self).on_wait_result_async()
+	logging.debug("BroomClient.on_wait_result_async - sending data '%s' to %s" % (self.data, self._client.id))
+	self._client.send(self.data)
+	logging.debug("Leaving BroomClient.on_wait_result_async")
 
 
 #-------------------------------------------------------------
@@ -52,49 +66,68 @@ class BroomClient(YieldingClient):
 # 
 class Broom(object):
 	def __init__(self,  classname, router, cnt):
+		logging.debug("Entering Broom.__init__")
 		self._classname = classname
 		self._router 	= router
 		self._cnt 	= cnt
-		self._mapping  	= []
 		self._is_run	= False
-		# self._iter 	= None
+		logging.debug("Leaving Broom.__init__")
+
 
 	def run(self):
+		logging.debug("Entering Broom.run")
 		if self._is_run:
+			logging.debug("Leaving Broom.run - already run")
 			return
+
+		random.seed()
 		# function to launch server
+		logging.debug("Broom.run - create mq")
 		q = multiprocessing.Queue()
+
+		logging.debug("Broom.run - create _start_server handler")
 		def _start_server(q):
-			path = 'ipc://%s-%s' % (os.getpid() , time.time())
+			logging.debug("Entering Broom.run._start_server")
+			path = 'ipc://tmp/%s-%s.sock' % (os.getpid() , time.time())
 			srv = self._classname(path, self._router, 1)
-			srv.start()
 			q.put(path)
+			logging.debug("Lauching Broom svr %s / %s" % (self._classname, path))
+			srv.start()
+
 		# run all processes
+		logging.debug("Broom.run - launching worker processes")
 		processes = []
 		for i in xrange(self._cnt):
 			p = multiprocessing.Process(target = _start_server, args=(q,))
 			p.start()
 			processes.append(p)
 		# gather path from all processes
+		logging.debug("Broom.run - receiving worker sockets")
 		self._workers 	= []
 		for p in processes:
-			self._workers.append(q.get())
-
+			sock = q.get()
+			self._workers.append(sock)
+			logging.debug("Broom.run - receiving worker socket %s" % sock)
 		self._is_run = True
+		logging.debug("Leaving Broom.run - completed")
 
 	def shutdown(self):
 		for p in processes:
 			p.terminate()
 
 	def relay(self, clt, command):
-		broom_clt = "%f" % random.random()
+		logging.debug("Entering Broom.relay with command '%s'" % command)
+		broom_clt = "%010d" % random.randint(0,100000000)
+		logging.debug("Broom.relay - generate id '%s'" % broom_clt)
+
 		c = BroomClient(
 			address 	= random.choice(self._workers),
 			identity 	= broom_clt,
 			client 		= clt)
-		
-		self._mapping[broom_clt] = clt
+		c.connect()
+		logging.debug("Broom.relay - send command to %s : %s" % (clt, command))
 		c.send(command)
+		logging.debug("Leaving Broom.relay")
 		return c.wait_result_async()
 
 

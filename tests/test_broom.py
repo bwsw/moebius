@@ -15,6 +15,10 @@ from   zmq.eventloop import ioloop, zmqstream
 from   Queue import Queue
 from   moebius import *
 
+import logging
+import sys
+
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 #-------------------------------------------------------------
 # specific client which is derived from basic REQ/REP client
@@ -27,7 +31,8 @@ class Client(utils.YieldingClient):
 	self.send(message)
 	for i in self.wait_result_async(30):
 		time.sleep(1)
-	print "Failed to wait"
+	if self.data is None:
+		print "Failed to wait"
 	data = self.recv_no_wait()
 	print "Data is: %s" % data
 	return data

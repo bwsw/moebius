@@ -1,5 +1,6 @@
 import time
 import zmq
+import logging
 from   zmq.eventloop import ioloop, zmqstream
 from   Queue import Queue
 from   moebius import *
@@ -78,10 +79,14 @@ class YieldingClient(object):
     _socket = None
 
     def __init__(self, *args, **kwargs):
+	logging.debug("Entering YieldingClient.__init__")
         self._address = kwargs['address']
+	self._data = None
         self._socket_type = kwargs.pop('socket_type', zmq.DEALER)
         self._identity = kwargs.pop('identity', None)
+	logging.debug("YieldingClient.__init__ creating poller")
 	self._poller = zmq.Poller()
+	logging.debug("Leaving YieldingClient.__init__")
 
 
     def connect(self):
@@ -131,3 +136,7 @@ class YieldingClient(object):
     @property
     def id(self):
         return self._identity
+
+    @property
+    def data(self):
+	return self._data
