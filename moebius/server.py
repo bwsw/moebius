@@ -6,14 +6,13 @@ from connection import ZMQConnection
 from errors import *
 
 
-class ZMQServer:
+class ZMQServer(object):
     _loop = True
     _poll_forever = True
     _generator_dictionary = {}
     _socket_ids = set()
     _connections = dict()
 
-    
     def __init__(self, address, router, poll_wait = 5):
         self._address = address
         self._router = router

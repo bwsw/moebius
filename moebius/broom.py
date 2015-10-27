@@ -5,8 +5,8 @@ import time
 import multiprocessing
 from constants import *
 from connection import ZMQConnection
-from server import *
-from router import *
+from server import ZMQServer
+from router import ZMQRouter
 from errors import *
 from utils import YieldingClient
 
@@ -25,7 +25,8 @@ class BroomHandler(object):
 #
 class BroomProxyRouter(ZMQRouter):
 	def __init__(self):
-		super(ZMQRouter, self).__init__(None)
+		super(BroomProxyRouter, self).__init__(None)
+
 	def process(self, **kwargs):
 		return (STRATEGY_QUEUE, BroomHandler)
 
@@ -65,13 +66,13 @@ class Broom(object):
 		q = multiprocessing.Queue()
 		def _start_server(q):
 			path = 'ipc://%s-%s' % (os.getpid() , time.time())
-			srv = self._classname(path, self_.router, 1)
+			srv = self._classname(path, self._router, 1)
 			srv.start()
 			q.put(path)
 		# run all processes
 		processes = []
 		for i in xrange(self._cnt):
-			p = multiprocessing.Process(target = _start_server, args=())
+			p = multiprocessing.Process(target = _start_server, args=(q,))
 			p.start()
 			processes.append(p)
 		# gather path from all processes
@@ -80,9 +81,6 @@ class Broom(object):
 			self._workers.append(q.get())
 
 		self._is_run = True
-		# join all processes
-		# for p in processes:
-		# 	p.join()
 
 	def shutdown(self):
 		for p in processes:
@@ -103,9 +101,10 @@ class Broom(object):
 #-------------------------------------------------------------
 # broom proxy server class. Always relays messages to broom
 #
-class BroomProxyServer(ZMQServer):
+class BroomServer(ZMQServer):
 	def __init__(self, address, broom, poll_wait = 1):
-		super(ZMQServer,self).__init__(address, BroomProxyRouter(), poll_wait)
+		router = BroomProxyRouter()
+		super(BroomServer, self).__init__(address, router, poll_wait)
 		self._broom = broom
 
 	@property

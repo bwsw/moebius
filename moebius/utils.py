@@ -121,6 +121,13 @@ class YieldingClient(object):
 	else:
 		return self._socket.recv()
 
+
+    def recv_no_wait(self):
+	if self._data:
+		return self._data
+	else:
+		return None
+
     @property
     def id(self):
         return self._identity
