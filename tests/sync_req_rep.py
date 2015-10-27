@@ -33,7 +33,7 @@ def start_server(port):
     rules = [
         {
             'command': 'reply',
-            'handler': (STRATEGY_QUEUE, handlers.ReplyHandler)
+            'handler': (STRATEGY_QUEUE, handlers.ReplyHandler3)
         }
     ]
     router = ZMQRouter(rules)
@@ -62,11 +62,11 @@ if __name__ == "__main__":
     s.start()
     child = []
 
-    for i in xrange(3):
+    for i in xrange(1000):
         child.append(multiprocessing.Process(target=start_sync_client_strategy, args=(port, i,)))
 	child[i].start()
 
-    for i in xrange(3):
+    for i in xrange(1000):
 	child[i].join()
 
     s.terminate()

@@ -110,6 +110,7 @@ class YieldingClient(object):
 	pass
 
     def wait_result_async(self,timeout = None):
+	logging.debug("Entering YieldingClient.__init__")
 	t = time.time()
 	self._data = None
 	while (self._data is None) and ((timeout is None) or (time.time() - t < timeout)):

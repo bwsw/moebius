@@ -1,6 +1,7 @@
 import zmq
 import types
 import itertools
+import logging
 from constants import *
 from connection import ZMQConnection
 from errors import *
@@ -99,11 +100,9 @@ class ZMQServer(object):
                         self._handle_request(self._connections[socket_id])
                 self._handle_generators()
         except KeyboardInterrupt:
-            print 'Stopped by interruption'
+	    logging.error('Stopped by keyboard interruption')
         except:
             raise
-
-        print "STOPPED"
 
     def stop(self):
         self._loop = False

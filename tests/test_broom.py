@@ -29,7 +29,7 @@ class Client(utils.YieldingClient):
 
     def run(self, message):
 	self.send(message)
-	for i in self.wait_result_async(30):
+	for i in self.wait_result_async():
 		time.sleep(1)
 	if self.data is None:
 		print "Failed to wait"
@@ -43,11 +43,11 @@ def start_server(port):
     rules = [
         {
             'command': 'reply',
-            'handler': (STRATEGY_QUEUE, handlers.ReplyHandler)
+            'handler': (STRATEGY_QUEUE, handlers.ReplyHandler3)
         }
     ]
     router = ZMQRouter(rules)
-    broom = Broom(ZMQServer, router, 4)
+    broom = Broom(ZMQServer, router, 40)
 
     srv = BroomServer('tcp://127.0.0.1:%s' % port, broom, 1)
     print 'Server created'
@@ -74,9 +74,19 @@ if __name__ == "__main__":
     s.start()
     child = []
 
-    c = multiprocessing.Process(target=start_sync_client, args=(port, 1))
-    c.start()
-    c.join()
+    time.sleep(10)
+
+    for i in xrange(100):
+        child.append(multiprocessing.Process(target=start_sync_client, args=(port, i,)))
+	child[i].start()
+
+    for i in xrange(100):
+	child[i].join()
+
+
+    #c = multiprocessing.Process(target=start_sync_client, args=(port, 1))
+    #c.start()
+    #c.join()
 
     s.terminate()
 
