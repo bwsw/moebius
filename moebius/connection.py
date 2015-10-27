@@ -6,8 +6,9 @@ class ZMQConnection(object):
     _socket = None
     _clients = dict()
 
-    def __init__(self, address):
+    def __init__(self, address, server):
         self._address = address
+	self._server = server
 
     def create(self):
         context = zmq.Context()
@@ -60,6 +61,10 @@ class ZMQConnection(object):
     def id(self):
         return self._socket.getsockopt(zmq.IDENTITY)
 
+    @property
+    def server(self):
+	return self._server
+
 
 class ZMQClient(object):
     def __init__(self, connection, client_id):
@@ -78,3 +83,7 @@ class ZMQClient(object):
     @property
     def id(self):
         return self._client_id
+
+    @property
+    def connection(self):
+	return self._connection

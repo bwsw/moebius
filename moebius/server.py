@@ -73,7 +73,7 @@ class ZMQServer:
 
     def start(self):
         poller = zmq.Poller()
-        connection = ZMQConnection(self._address)
+        connection = ZMQConnection(self._address, self)
         connection.create()
         poller.register(connection.socket, zmq.POLLIN)
 

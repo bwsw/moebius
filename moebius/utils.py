@@ -101,6 +101,9 @@ class YieldingClient(object):
     def send(self, message):
         self._socket.send(message)
 
+    def on_wait_result_async(self):
+	pass
+
     def wait_result_async(self,timeout = None):
 	t = time.time()
 	self._data = None
@@ -108,6 +111,7 @@ class YieldingClient(object):
 		sockets = dict(self._poller.poll(0))
 		if len(sockets):
 			self._data = self._socket.recv()
+			self.on_wait_result_async()
 		if self._data is None:
 			yield
 
