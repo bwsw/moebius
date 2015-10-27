@@ -26,7 +26,8 @@ class Client(utils.YieldingClient):
     def run(self, message):
 	self.send(message)
 	for i in self.wait_result_async():
-		print "%s waiting" % self.id
+		time.sleep(1)
+		# print "%s waiting" % self.id
 	data = self.recv()
 	return data
 
@@ -65,11 +66,11 @@ if __name__ == "__main__":
     s.start()
     child = []
 
-    for i in xrange(3):
+    for i in xrange(1000):
         child.append(multiprocessing.Process(target=start_sync_client_strategy, args=(port, i,)))
 	child[i].start()
 
-    for i in xrange(3):
+    for i in xrange(1000):
 	child[i].join()
 
     s.terminate()

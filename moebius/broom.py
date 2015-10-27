@@ -22,6 +22,7 @@ class BroomHandler(object):
 		broom = client.connection.server.broom
 		broom.run()
 		r = broom.relay(client,data)
+		logging.debug("BroomHandler.run - relay is %s" % r)
 		logging.debug("Leaving BroomHandler.run")
 		return r
 
@@ -43,7 +44,7 @@ class BroomClient(YieldingClient):
     def __init__(self, *args, **kwargs):
 	logging.debug("Entering BroomClient.__init__")
 	super(BroomClient, self).__init__(*args,**kwargs)
-	self._client = kwargs['client']
+	self._client = kwargs['src_client']
 	logging.debug("Leaving BroomClient.__init__")
 
 
@@ -123,7 +124,8 @@ class Broom(object):
 		c = BroomClient(
 			address 	= random.choice(self._workers),
 			identity 	= broom_clt,
-			client 		= clt)
+			src_client 	= clt)
+
 		c.connect()
 		logging.debug("Broom.relay - send command to %s : %s" % (clt, command))
 		c.send(command)

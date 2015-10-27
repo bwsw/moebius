@@ -17,6 +17,7 @@ from   moebius import *
 
 import logging
 import sys
+import os
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
@@ -28,7 +29,9 @@ class Client(utils.YieldingClient):
         super(Client, self).send(message=message)
 
     def run(self, message):
+	logging.debug("Entering Client.run - %s" % os.getpid())
 	self.send(message)
+	logging.debug("Sent msg at Client.run - %s" % os.getpid())
 	for i in self.wait_result_async():
 		time.sleep(1)
 	if self.data is None:
@@ -76,11 +79,11 @@ if __name__ == "__main__":
 
     time.sleep(10)
 
-    for i in xrange(100):
+    for i in xrange(500):
         child.append(multiprocessing.Process(target=start_sync_client, args=(port, i,)))
 	child[i].start()
 
-    for i in xrange(100):
+    for i in xrange(500):
 	child[i].join()
 
 

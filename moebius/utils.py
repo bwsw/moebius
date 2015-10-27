@@ -1,5 +1,6 @@
 import time
 import zmq
+import os
 import logging
 from   zmq.eventloop import ioloop, zmqstream
 from   Queue import Queue
@@ -79,14 +80,14 @@ class YieldingClient(object):
     _socket = None
 
     def __init__(self, *args, **kwargs):
-	logging.debug("Entering YieldingClient.__init__")
+	logging.debug("Entering YieldingClient.__init__ - %s" % os.getpid())
         self._address = kwargs['address']
 	self._data = None
         self._socket_type = kwargs.pop('socket_type', zmq.DEALER)
         self._identity = kwargs.pop('identity', None)
-	logging.debug("YieldingClient.__init__ creating poller")
+	logging.debug("YieldingClient.__init__ - creating poller - %s" % os.getpid())
 	self._poller = zmq.Poller()
-	logging.debug("Leaving YieldingClient.__init__")
+	logging.debug("Leaving YieldingClient.__init__ %s" % os.getpid())
 
 
     def connect(self):
@@ -110,7 +111,7 @@ class YieldingClient(object):
 	pass
 
     def wait_result_async(self,timeout = None):
-	logging.debug("Entering YieldingClient.__init__")
+	logging.debug("Entering YieldingClient.wait_result_async - %s" % os.getpid())
 	t = time.time()
 	self._data = None
 	while (self._data is None) and ((timeout is None) or (time.time() - t < timeout)):
