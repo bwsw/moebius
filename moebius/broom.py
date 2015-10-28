@@ -66,11 +66,12 @@ class BroomClient(YieldingClient):
 # broom
 # 
 class Broom(object):
-	def __init__(self,  classname, router, cnt):
+	def __init__(self, *args,**kwargs): 
 		logging.debug("Entering Broom.__init__")
-		self._classname = classname
-		self._router 	= router
-		self._cnt 	= cnt
+		self._classname = kwargs["classname"]
+		self._router 	= kwargs["router"]
+		self._cnt 	= kwargs["workers"]
+		self._tmpdir	= kwargs["tmpdir"].rstrip("/")
 		self._is_run	= False
 		logging.debug("Leaving Broom.__init__")
 
@@ -89,7 +90,7 @@ class Broom(object):
 		logging.debug("Broom.run - create _start_server handler")
 		def _start_server(q):
 			logging.debug("Entering Broom.run._start_server")
-			path = 'ipc://tmp/%s-%s.sock' % (os.getpid() , time.time())
+			path = 'ipc://%s/%s-%s.sock' % (self._tmpdir, os.getpid() , time.time())
 			srv = self._classname(path, self._router, 1)
 			q.put(path)
 			logging.debug("Lauching Broom svr %s / %s" % (self._classname, path))

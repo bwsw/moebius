@@ -19,7 +19,7 @@ import logging
 import sys
 import os
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
 #-------------------------------------------------------------
 # specific client which is derived from basic REQ/REP client
@@ -50,7 +50,11 @@ def start_server(port):
         }
     ]
     router = ZMQRouter(rules)
-    broom = Broom(ZMQServer, router, 40)
+    broom = Broom(
+		classname = ZMQServer, 
+		router = router, 
+		workers = 40, 
+		tmpdir = "tmp")
 
     srv = BroomServer('tcp://127.0.0.1:%s' % port, broom, 1)
     print 'Server created'
@@ -77,13 +81,13 @@ if __name__ == "__main__":
     s.start()
     child = []
 
-    time.sleep(10)
+    time.sleep(2)
 
-    for i in xrange(500):
+    for i in xrange(10):
         child.append(multiprocessing.Process(target=start_sync_client, args=(port, i,)))
 	child[i].start()
 
-    for i in xrange(500):
+    for i in xrange(10):
 	child[i].join()
 
 
