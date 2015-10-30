@@ -295,6 +295,17 @@ class TestServer(ZMQServer):
 
 ```
 
+## Exception handling
+
+There are two exception handlers available inside ZMQServer:
+
+1. ```def on_exception_msg(self, client, message, e)```
+2. ```def on_exception_next(self,client, gen, e)```
+
+First is called when an exception occures during initial message processing (eg, creating generator or handling message if regular function is used as handler). The second is called when generator does next iteration and an exception occures during this operation. If you would like to do custom processing, override this handlers.
+
+
+
 ## ZeroMQ yielding dealer client
 
 To use effectively DEALER connections to remote ROUTERs (for eg. another Moebius instances) inside of Moebius handlers we have to use yielding client implementation which doesn't block Moebius server and gives effective way to serve another clients. There as moebius.utils.YieldingClient which solves this problem. Below an example of how to use it.
