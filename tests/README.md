@@ -302,7 +302,7 @@ There are two exception handlers available inside ZMQServer:
 1. ```def on_exception_msg(self, client, message, e)```
 2. ```def on_exception_next(self,client, gen, e)```
 
-First is called when an exception occures during initial message processing (eg, creating generator or handling message if regular function is used as handler). The second is called when generator does next iteration and an exception occures during this operation. If you would like to do custom processing, override this handlers.
+First is called when an exception occures during initial message processing (eg, creating generator or handling message if regular function is used as handler). The second is called when generator does next iteration and an exception occures during this operation. If you want to do custom processing, override this handlers.
 
 
 
