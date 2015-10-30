@@ -27,21 +27,41 @@ class ZMQServer(object):
             return
 
         try:
-            strategy, handler = self._router.process(message=message)
+            strategy, handler = self._router.process(message = message)
 
             if client.id not in self._generator_dictionary:
-                self._generator_dictionary[client.id] = handler.run(client, message)
-                if not isinstance(self._generator_dictionary[client.id], types.GeneratorType):
+		try:
+			res = handler.run(client, message)
+			self._generator_dictionary[client.id] = res
+		except Exception as e:
+			self.on_exception_msg(client.id, message, e)
+
+                if (client.id in self._generator_dictionary) and not isinstance(self._generator_dictionary[client.id], types.GeneratorType):
                     del self._generator_dictionary[client.id]
                 else:
                     self._poll_forever = False
+
             else:
                 if strategy == STRATEGY_REPLACE:
-                    # del self._generator_dictionary[client.id]
-                    self._generator_dictionary[client.id] = handler.run(client, message)
+
+		    try:
+			res = handler.run(client, message)
+            		if isinstance(res, types.GeneratorType):
+                		self._generator_dictionary[client.id] = res
+		    except Exception as e:
+			self.on_exception_msg(client.id, message, e)
+
                 elif strategy == STRATEGY_QUEUE:
-                    self._generator_dictionary[client.id] = itertools.chain(self._generator_dictionary[client.id],
-                                                                            handler.run(client, message))
+
+		    current_q = self._generator_dictionary[client.id]
+		    try:
+			res = handler.run(client, message)
+            		if isinstance(res, types.GeneratorType):
+                		self._generator_dictionary[client.id] = itertools.chain(self._generator_dictionary[client.id], res)
+		    except Exception as e:
+			self._generator_dictionary[client.id] = current_q
+			self.on_exception_msg(client.id, message, e)
+
                 elif strategy == STRATEGY_IGNORE:
                     pass
                 else:
@@ -59,14 +79,19 @@ class ZMQServer(object):
             return
 
         mark_delete = []
-        for generator in self._generator_dictionary:
+        for clt in self._generator_dictionary:
             try:
-                result = self._generator_dictionary[generator].next()
+                result = self._generator_dictionary[clt].next()
+
+		# if iteration result is generator, then chain it
                 if isinstance(result, types.GeneratorType):
-                    self._generator_dictionary[generator] = itertools.chain(result,
-                                                                            self._generator_dictionary[generator])
+                    self._generator_dictionary[clt] = itertools.chain(result,
+                                                                        self._generator_dictionary[clt])
             except StopIteration:
-                mark_delete.append(generator)
+                mark_delete.append(clt)
+	    except Exception as e:
+                mark_delete.append(clt)
+		self.on_exception_next(clt, self._generator_dictionary[clt], e)
 
         for generator_to_delete in mark_delete:
             del self._generator_dictionary[generator_to_delete]
@@ -110,6 +135,22 @@ class ZMQServer(object):
 
     def background(self, connection):
         pass
+
+    def on_exception_msg(self, client, message, e):
+	logging.error("Message processing error occured ----------------")
+	logging.error("Client ID: %s" 	% client)
+	logging.error("Message: %s" 	% message)
+	logging.error("Exception: %s" 	% e)
+	logging.error("-------------------------------------------------")
+
+    
+    def on_exception_next(self,client, gen, e):
+	logging.error("Next iteration error occured. Generator wiil be removed ")
+	logging.error("Client ID: %s" 	% client)
+	logging.error("Generator is: %s" % gen)
+	logging.error("Exception: %s" 	% e)
+	logging.error("--------------------------------------------------------")
+
 
     @staticmethod
     def error_handler(exception, client):

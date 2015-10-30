@@ -11,10 +11,12 @@ import time
 import zmq
 import json
 import handlers
+import logging
 from   zmq.eventloop import ioloop, zmqstream
 from   Queue import Queue
 from   moebius import *
 
+logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
 #-------------------------------------------------------------
 # specific client which is derived from basic REQ/REP client
@@ -33,7 +35,7 @@ def start_server(port):
     rules = [
         {
             'command': 'reply',
-            'handler': (STRATEGY_QUEUE, handlers.ReplyHandler3)
+            'handler': (STRATEGY_QUEUE, handlers.ReplyHandlerErr)
         }
     ]
     router = ZMQRouter(rules)
@@ -62,11 +64,11 @@ if __name__ == "__main__":
     s.start()
     child = []
 
-    for i in xrange(1000):
+    for i in xrange(1):
         child.append(multiprocessing.Process(target=start_sync_client_strategy, args=(port, i,)))
 	child[i].start()
 
-    for i in xrange(1000):
+    for i in xrange(1):
 	child[i].join()
 
     s.terminate()

@@ -42,6 +42,23 @@ class ReplyHandler(object):
         client.send('Reply to %s' % client.id)
 
 
+class ReplyHandlerErr(object):
+    @staticmethod
+    def run(client, data):
+	ggr
+        random.seed()
+        yield sleep_async(random.randint(0,3))
+        client.send('Reply to %s' % client.id)
+
+
+class ReplyHandlerErr2(object):
+    @staticmethod
+    def run(client, data):
+	ggr
+        random.seed()
+        client.send('Reply to %s' % client.id)
+
+
 class ReplyHandler2(object):
     @staticmethod
     def run(client, data):
