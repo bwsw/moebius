@@ -19,10 +19,9 @@ Moebius uses well known and robust ZeroMQ (0mq) library to implement transport. 
 Moebius is single-threaded. It uses python generators to implement parallel processing of multiple clients. Developers can use either standard python methods to implement simple fast routines which just work or python generators to implement long-living routines which can run for seconds or minutes until completion.
 
 
-## Installation
+## Installation from sources
 
-To install Moebius, download
-
+To install Moebius, download the sources from the [github repository](https://github.com/bwsw/moebius) and perform the following steps:
 ```
 # create a virtualenv.
 # skip these tests if you already set up one for your project.
@@ -40,6 +39,7 @@ pip install .
 3. python-zmq library
 4. Tornado ioloop (Tornado framework installed)
 
+Please note that, actually, Moebius does not work with Python 3.x.
 
 ## Platforms
 
