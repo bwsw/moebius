@@ -7,7 +7,7 @@ Broom allows to switch from single-threaded processing model to worker-like proc
 1. Utilize all CPU cores on heavy services.
 2. Implement slow query processing (for example slow database response) without additional asynchronous code.
 
-If you just need to balance traffic among several Moebius then it's better to use regular HA-Proxy rather than Broom, because you could utilize less system resources and achieve better performance, but If you need "pure" solution, use Broom.
+If you just need to balance traffic among several Moebius and can install HA-Proxy then better use regular HA-Proxy rather than Broom, because it utilizes less system resources and achieves better performance, but If you need "pure" solution, use Broom.
 
 ## Status
 
