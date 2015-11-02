@@ -50,7 +50,7 @@ Moebius is tested and works well under next GNU/Linux distributions:
 
 ## Documentation
 
-See [tests](https://github.com/bwsw/moebius/tree/master/tests) directory for examples and Jump start.
+See [doc](https://github.com/bwsw/moebius/tree/master/doc) directory for documentation and [tests](https://github.com/bwsw/moebius/tree/master/tests) for examples.
 
 ## Performance
 
