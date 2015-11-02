@@ -1,4 +1,4 @@
-# Broom: Moebius multiprocessing offloading engine
+# Broom: Moebius multiprocessed offloading engine
 
 ## Purpose
 
