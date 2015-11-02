@@ -336,3 +336,7 @@ class SomeHandler(object):
 So, magis is inside ```	yield c.wait_result_async()``` which takes care about nonblocking awaiting of response from remote executor. After it receives response You just read it using ```c.recv()```.
 
 Method ```YieldingClient.wait_result_async(timeout = None)``` allows to specify timeout argument to avoid infinite waiting for response.
+
+## Additional modules
+
+1. [Broom](/doc/broom.md)
