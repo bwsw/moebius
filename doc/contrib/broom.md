@@ -6,7 +6,7 @@ Broom allows to switch from single-threaded processing model to worker-like proc
 
 1. Utilize all CPU cores on heavy services.
 2. Implement slow query processing (for example slow database response) without additional asynchronous code.
-3. 
+
 
 ## Status
 
