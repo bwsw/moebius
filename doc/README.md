@@ -339,4 +339,4 @@ Method ```YieldingClient.wait_result_async(timeout = None)``` allows to specify 
 
 ## Additional modules
 
-1. [Broom](./broom.md)
+1. [Broom](./contrib/broom.md)
