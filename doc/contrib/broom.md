@@ -11,3 +11,5 @@ Broom allows to switch from single-threaded processing model to worker-like proc
 ## Status
 
 It's alfa.
+
+## Usage
