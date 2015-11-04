@@ -7,27 +7,25 @@ import sys
 sys.path.append("..")
 
 import multiprocessing
-import time
-import zmq
 import json
 import handlers
 import logging
-from   zmq.eventloop import ioloop, zmqstream
-from   Queue import Queue
-from   moebius import *
+import moebius
+from constants import STRATEGY_QUEUE
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+
 
 #-------------------------------------------------------------
 # specific client which is derived from basic REQ/REP client
 #
-class Client(utils.ReqRepClient):
+class Client(moebius.utils.ReqRepClient):
     def send(self, message):
         super(Client, self).send(message=message)
 
     def on_recv(self, message):
         print message
-	exit(0)
+        exit(0)
 
 
 def start_server(port):
@@ -38,8 +36,8 @@ def start_server(port):
             'handler': (STRATEGY_QUEUE, handlers.ReplyHandlerErr)
         }
     ]
-    router = ZMQRouter(rules)
-    srv = ZMQServer('tcp://127.0.0.1:%s' % port, router)
+    router = moebius.ZMQRouter(rules)
+    srv = moebius.ZMQServer('tcp://127.0.0.1:%s' % port, router)
     print 'Server started'
     srv.start()
 
@@ -65,11 +63,12 @@ if __name__ == "__main__":
     child = []
 
     for i in xrange(1):
-        child.append(multiprocessing.Process(target=start_sync_client_strategy, args=(port, i,)))
-	child[i].start()
+        child.append(multiprocessing.Process(
+            target=start_sync_client_strategy,
+            args=(port, i,)))
+        child[i].start()
 
     for i in xrange(1):
-	child[i].join()
+        child[i].join()
 
     s.terminate()
-

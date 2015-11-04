@@ -1,10 +1,12 @@
 import sys
 sys.path.append("..")
 
-from moebius import *
-from test import *
+import zmq
+import moebius
+import json
 import sys
 import handlers
+from moebius.constants import STRATEGY_REPLACE, STRATEGY_IGNORE, STRATEGY_QUEUE
 
 from multiprocessing import Process
 
@@ -25,8 +27,8 @@ rules = [
 
 
 def start_server(port):
-    router = ZMQRouter(rules)
-    srv = ZMQServer('tcp://127.0.0.1:%s' % port, router)
+    router = moebius.ZMQRouter(rules)
+    srv = moebius.ZMQServer('tcp://127.0.0.1:%s' % port, router)
     print 'Server started'
     srv.start()
 
@@ -54,7 +56,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         strategy = sys.argv[1]
     if strategy not in strategies:
-        print "Please pass one of valid strategies to test: %s" % ', '.join(strategies)
+        print "Please pass one of valid strategies to test: %s" % (
+            ', '.join(strategies, ))
         exit(0)
 
     Process(target=start_server, args=(port,)).start()

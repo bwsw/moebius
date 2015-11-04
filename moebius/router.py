@@ -1,5 +1,5 @@
 import json
-from errors import *
+from errors import RouterProcessingError
 
 
 class ZMQRouter(object):
