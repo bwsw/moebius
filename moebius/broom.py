@@ -89,7 +89,6 @@ class Broom(object):
 
                 def _start_server(q):
                         logging.debug("Entering Broom.run._start_server")
-                        # dbg
                         path = 'ipc:///%s/%s-%s.sock' % (
                             self._tmpdir, os.getpid(), time.time())
                         srv = self._classname(path, self._router, 1)

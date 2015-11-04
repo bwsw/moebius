@@ -75,7 +75,8 @@ class ZMQServer(object):
                 elif strategy == STRATEGY_IGNORE:
                     pass
                 else:
-                    raise UnknownStrategyError('Unknown strategy')
+                    raise UnknownStrategyError(
+                        'Unknown strategy: "{}"'.format(strategy))
         except HandlerProcessingError, e:
             if client.id in self._generator_dictionary:
                 del self._generator_dictionary[client.id]

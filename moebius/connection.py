@@ -15,8 +15,6 @@ class ZMQConnection(object):
         self._socket = context.socket(zmq.ROUTER)
         # ZMQ_ROUTER_MANDATORY
         self._socket.setsockopt(33, 1)
-        # dbg
-        print 'XXX self._address: {}'.format(self._address)
         self._socket.bind(self._address)
 
     def process(self):
