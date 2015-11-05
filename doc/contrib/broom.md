@@ -17,4 +17,6 @@ It's alfa.
 
 First, ensure you have single-threaded Moebius application is designed well and works properly, so it's tested well and passes external specification. It's quite complicated to debug code which runs on multiple cores so better to test all using standard moebius programming model. 
 
+## System tuning
 
+Since Broom uses Yielding Client, it uses a lot of ZMQ Poller objects, so If you have high traffic to broom and slow queries, then use ```ulimit``` to tune amount of open files, eg. ```ulimit -Hn 8192```.
