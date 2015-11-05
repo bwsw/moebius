@@ -2,11 +2,11 @@ import time
 import zmq
 import os
 import logging
-from   zmq.eventloop import ioloop, zmqstream
-from   Queue import Queue
-from   moebius import *
+from zmq.eventloop import ioloop, zmqstream
+#from moebius import *
 
 ioloop.install()
+
 
 ###----------------------------------------------------------------
 ### utility generator which yields for specific amount of time
@@ -16,10 +16,11 @@ def sleep_async(timeout):
     while time.time() - t < timeout:
         yield time.time()
 
-#-------------------------------------------------------------------------------------------
+
+#------------------------------------------------------------------
 # define client to test req/rep pattern on DEALER/ROUTER
 # uses tornado ioloop
-# 
+#
 class ReqRepClient(object):
     _socket = None
 
@@ -67,28 +68,23 @@ class ReqRepClient(object):
         return self._identity
 
 
-
-
-
-
-
-#-------------------------------------------------------------------------------------------
+#------------------------------------------------------------------
 # define client to test req/rep pattern on DEALER/ROUTER
 # uses tornado ioloop
-# 
+#
 class YieldingClient(object):
     _socket = None
 
     def __init__(self, *args, **kwargs):
-	logging.debug("Entering YieldingClient.__init__ - %s" % os.getpid())
+        logging.debug("Entering YieldingClient.__init__ - %s" % os.getpid())
         self._address = kwargs['address']
-	self._data = None
+        self._data = None
         self._socket_type = kwargs.pop('socket_type', zmq.DEALER)
         self._identity = kwargs.pop('identity', None)
-	logging.debug("YieldingClient.__init__ - creating poller - %s" % os.getpid())
-	self._poller = zmq.Poller()
-	logging.debug("Leaving YieldingClient.__init__ %s" % os.getpid())
-
+        logging.debug("YieldingClient.__init__ - creating poller - %s" % (
+            os.getpid(), ))
+        self._poller = zmq.Poller()
+        logging.debug("Leaving YieldingClient.__init__ %s" % os.getpid())
 
     def connect(self):
         context = zmq.Context()
@@ -99,7 +95,7 @@ class YieldingClient(object):
         # ZMQ_PROBE_ROUTER
         self._socket.setsockopt(51, 1)
         self._socket.connect(self._address)
-	self._poller.register(self._socket, zmq.POLLIN)
+        self._poller.register(self._socket, zmq.POLLIN)
 
     def disconnect(self):
         raise self._socket.close()
@@ -108,32 +104,33 @@ class YieldingClient(object):
         self._socket.send(message)
 
     def on_wait_result_async(self):
-	pass
+        pass
 
-    def wait_result_async(self,timeout = None):
-	logging.debug("Entering YieldingClient.wait_result_async - %s" % os.getpid())
-	t = time.time()
-	self._data = None
-	while (self._data is None) and ((timeout is None) or (time.time() - t < timeout)):
-		sockets = dict(self._poller.poll(0))
-		if len(sockets):
-			self._data = self._socket.recv()
-			self.on_wait_result_async()
-		if self._data is None:
-			yield
+    def wait_result_async(self, timeout=None):
+        logging.debug("Entering YieldingClient.wait_result_async - %s" % (
+            os.getpid()))
+        t = time.time()
+        self._data = None
+        while (self._data is None and
+                ((timeout is None) or (time.time() - t < timeout))):
+                sockets = dict(self._poller.poll(0))
+                if len(sockets):
+                        self._data = self._socket.recv()
+                        self.on_wait_result_async()
+                if self._data is None:
+                        yield
 
     def recv(self):
-	if self._data:
-		return self._data
-	else:
-		return self._socket.recv()
-
+        if self._data:
+                return self._data
+        else:
+                return self._socket.recv()
 
     def recv_no_wait(self):
-	if self._data:
-		return self._data
-	else:
-		return None
+        if self._data:
+                return self._data
+        else:
+                return None
 
     @property
     def id(self):
@@ -141,4 +138,4 @@ class YieldingClient(object):
 
     @property
     def data(self):
-	return self._data
+        return self._data

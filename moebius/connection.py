@@ -1,5 +1,5 @@
 import zmq
-from errors import *
+from errors import ConnectionSendError
 
 
 class ZMQConnection(object):
@@ -8,7 +8,7 @@ class ZMQConnection(object):
 
     def __init__(self, address, server):
         self._address = address
-	self._server = server
+        self._server = server
 
     def create(self):
         context = zmq.Context()
@@ -33,21 +33,20 @@ class ZMQConnection(object):
                 del self._clients[client_id]
             raise ConnectionSendError(e, client_id)
 
-    def broadcast(self, message, filter_function = None):
+    def broadcast(self, message, filter_function=None):
 
-	if filter_function == None:
-	    filter_function = lambda client: True
+        if filter_function is None:
+            filter_function = lambda client: True
 
         for client_id in self._clients:
-	    if filter_function(self._clients[client_id]):
-        	self._clients[client_id].send(message)
+            if filter_function(self._clients[client_id]):
+                self._clients[client_id].send(message)
 
-    def iterate(self, handler_function = None):
-	if handler_function == None:
-	    handler_function = lambda client: True
+    def iterate(self, handler_function=None):
+        if handler_function is None:
+            handler_function = lambda client: True
         for client_id in self._clients:
-	    handler_function(self._clients[client_id])
-
+            handler_function(self._clients[client_id])
 
     def close(self, client_id):
         if client_id in self._clients:
@@ -63,7 +62,7 @@ class ZMQConnection(object):
 
     @property
     def server(self):
-	return self._server
+        return self._server
 
 
 class ZMQClient(object):
@@ -74,7 +73,7 @@ class ZMQClient(object):
     def send(self, message):
         self._connection.send(self._client_id, message)
 
-    def broadcast(self, message, filter_function = None):
+    def broadcast(self, message, filter_function=None):
         self._connection.broadcast(message, filter_function)
 
     def close(self):
@@ -86,4 +85,4 @@ class ZMQClient(object):
 
     @property
     def connection(self):
-	return self._connection
+        return self._connection
