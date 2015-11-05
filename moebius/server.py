@@ -172,3 +172,8 @@ class ZMQServer(object):
     def error_handler(exception, client):
         print client.id
         print exception
+
+
+    @property
+    def address(self):
+        return self._address
