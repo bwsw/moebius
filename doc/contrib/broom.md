@@ -11,7 +11,7 @@ If you just need to balance traffic among several Moebius and can install HAProx
 
 ## Status
 
-It's alfa.
+It's alfa. Need to be tested properly.
 
 ## Usage
 
