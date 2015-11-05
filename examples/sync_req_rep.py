@@ -11,7 +11,7 @@ import json
 import handlers
 import logging
 import moebius
-from constants import STRATEGY_QUEUE
+from moebius.constants import STRATEGY_QUEUE
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
@@ -33,7 +33,7 @@ def start_server(port):
     rules = [
         {
             'command': 'reply',
-            'handler': (STRATEGY_QUEUE, handlers.ReplyHandlerErr)
+            'handler': (STRATEGY_QUEUE, handlers.ReplyHandler)
         }
     ]
     router = moebius.ZMQRouter(rules)

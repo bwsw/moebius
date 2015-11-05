@@ -11,7 +11,7 @@ import time
 import json
 import handlers
 import moebius
-from constants import STRATEGY_QUEUE
+from moebius.constants import STRATEGY_QUEUE
 
 
 class Timer(object):
