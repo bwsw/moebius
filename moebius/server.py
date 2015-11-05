@@ -9,7 +9,11 @@ from errors import \
     HandlerProcessingError, \
     RouterProcessingError
 
-
+class Handler(object):
+    @staticmethod
+    def run(client, data):
+        pass
+    
 class ZMQServer(object):
     _loop = True
     _poll_forever = True

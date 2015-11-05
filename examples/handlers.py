@@ -5,9 +5,10 @@ from moebius.utils import sleep_async
 from moebius.errors import \
     ConnectionSendError, \
     HandlerProcessingError
+from moebius.server import Handler
 
 
-class StartHandler(object):
+class StartHandler(Handler):
     @staticmethod
     def run(client, data):
         for i in range(10):
@@ -22,14 +23,14 @@ class StartHandler(object):
                 raise HandlerProcessingError(e)
 
 
-class StopHandler(object):
+class StopHandler(Handler):
     @staticmethod
     def run(client, data):
         print 'stop'
         pass
 
 
-class TestHandler(object):
+class TestHandler(Handler):
     @staticmethod
     def run(client, data):
         d = json.loads(data)
@@ -38,7 +39,7 @@ class TestHandler(object):
             yield sleep_async(1)
 
 
-class ReplyHandler(object):
+class ReplyHandler(Handler):
     @staticmethod
     def run(client, data):
         random.seed()
@@ -46,7 +47,7 @@ class ReplyHandler(object):
         client.send('Reply to %s' % client.id)
 
 
-class ReplyHandlerErr(object):
+class ReplyHandlerErr(Handler):
     @staticmethod
     def run(client, data):
         random.seed()
@@ -54,7 +55,7 @@ class ReplyHandlerErr(object):
         client.send('Reply to %s' % client.id)
 
 
-class ReplyHandlerErr2(object):
+class ReplyHandlerErr2(Handler):
     @staticmethod
     def run(client, data):
         ggr
@@ -62,7 +63,7 @@ class ReplyHandlerErr2(object):
         client.send('Reply to %s' % client.id)
 
 
-class ReplyHandler2(object):
+class ReplyHandler2(Handler):
     @staticmethod
     def run(client, data):
         random.seed()
@@ -70,7 +71,7 @@ class ReplyHandler2(object):
         client.send('Reply to %s' % client.id)
 
 
-class ReplyHandler3(object):
+class ReplyHandler3(Handler):
     @staticmethod
     def run(client, data):
         random.seed()
@@ -78,7 +79,7 @@ class ReplyHandler3(object):
         client.send('Reply to %s' % client.id)
 
 
-class ReplyHandlerEchoNoWait(object):
+class ReplyHandlerEchoNoWait(Handler):
     @staticmethod
     def run(client, data):
         client.send('Reply to %s' % client.id)
