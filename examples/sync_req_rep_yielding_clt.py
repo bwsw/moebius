@@ -8,28 +8,26 @@ sys.path.append("..")
 
 import multiprocessing
 import time
-import zmq
 import json
 import handlers
-from   zmq.eventloop import ioloop, zmqstream
-from   Queue import Queue
-from   moebius import *
+import moebius
+from moebius.constants import STRATEGY_QUEUE
 
 
 #-------------------------------------------------------------
 # specific client which is derived from basic REQ/REP client
 #
-class Client(utils.YieldingClient):
+class Client(moebius.utils.YieldingClient):
     def send(self, message):
         super(Client, self).send(message=message)
 
     def run(self, message):
-	self.send(message)
-	for i in self.wait_result_async():
-		time.sleep(1)
-		# print "%s waiting" % self.id
-	data = self.recv()
-	return data
+        self.send(message)
+        for i in self.wait_result_async():
+                time.sleep(1)
+                # print "%s waiting" % self.id
+        data = self.recv()
+        return data
 
 
 def start_server(port):
@@ -40,8 +38,8 @@ def start_server(port):
             'handler': (STRATEGY_QUEUE, handlers.ReplyHandler2)
         }
     ]
-    router = ZMQRouter(rules)
-    srv = ZMQServer('tcp://127.0.0.1:%s' % port, router)
+    router = moebius.ZMQRouter(rules)
+    srv = moebius.ZMQServer('tcp://127.0.0.1:%s' % port, router)
     print 'Server started'
     srv.start()
 
@@ -67,11 +65,12 @@ if __name__ == "__main__":
     child = []
 
     for i in xrange(1000):
-        child.append(multiprocessing.Process(target=start_sync_client_strategy, args=(port, i,)))
-	child[i].start()
+        child.append(multiprocessing.Process(
+            target=start_sync_client_strategy,
+            args=(port, i,)))
+        child[i].start()
 
     for i in xrange(1000):
-	child[i].join()
+        child[i].join()
 
     s.terminate()
-

@@ -8,15 +8,11 @@ sys.path.append("..")
 
 import multiprocessing
 import time
-import zmq
 import json
 import handlers
-from   zmq.eventloop import ioloop, zmqstream
-from   Queue import Queue
-from   moebius import *
+import moebius
+from moebius.constants import STRATEGY_QUEUE
 
-
-import time
 
 class Timer(object):
     def __init__(self, verbose=False):
@@ -33,16 +29,17 @@ class Timer(object):
         if self.verbose:
             print 'elapsed time: %f ms' % self.msecs
 
+
 #-------------------------------------------------------------
 # specific client which is derived from basic REQ/REP client
 #
-class Client(utils.ReqRepClient):
+class Client(moebius.utils.ReqRepClient):
     def send(self, message):
         super(Client, self).send(message=message)
 
     def on_recv(self, message):
         print message
-	exit(0)
+        exit(0)
 
 
 def start_server(port):
@@ -53,8 +50,8 @@ def start_server(port):
             'handler': (STRATEGY_QUEUE, handlers.ReplyHandlerEchoNoWait)
         }
     ]
-    router = ZMQRouter(rules)
-    srv = ZMQServer('tcp://127.0.0.1:%s' % port, router, 1)
+    router = moebius.ZMQRouter(rules)
+    srv = moebius.ZMQServer('tcp://127.0.0.1:%s' % port, router, 1)
     print 'Server started'
     srv.start()
 
@@ -70,13 +67,13 @@ def start_sync_client_strategy(port, id):
     cl.connect()
     print "Send message by %s" % cl.id
     m = json.dumps(message)
-    
+
     cnt = 10000
     with Timer() as t:
-	for i in range(cnt):
-		reply = cl.send_with_reply(m)
+        for i in range(cnt):
+            cl.send_with_reply(m)
     print "=> elasped time is: %s s" % t.secs
-    print "=> performance (q/s): %d" % (cnt/t.secs)
+    print "=> performance (q/s): %d" % (cnt / t.secs)
     #print reply
 
 
@@ -87,18 +84,20 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         cnt = int(sys.argv[1])
     if cnt <= 0:
-	cnt = 1
+        cnt = 1
 
     s = multiprocessing.Process(target=start_server, args=(port,))
     s.start()
     child = []
 
     for i in xrange(cnt):
-        child.append(multiprocessing.Process(target=start_sync_client_strategy, args=(port, i,)))
-	child[i].start()
+        child.append(
+            multiprocessing.Process(
+                target=start_sync_client_strategy,
+                args=(port, i,)))
+        child[i].start()
 
     for i in xrange(cnt):
-	child[i].join()
+        child[i].join()
 
     s.terminate()
-

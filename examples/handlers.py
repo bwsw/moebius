@@ -1,8 +1,11 @@
 import time
 import json
 import random
-from moebius.errors import *
 from moebius.utils import sleep_async
+from moebius.errors import \
+    ConnectionSendError, \
+    HandlerProcessingError
+
 
 class StartHandler(object):
     @staticmethod
@@ -31,30 +34,30 @@ class TestHandler(object):
     def run(client, data):
         d = json.loads(data)
         for i in range(3):
-            print "%d: Got %s from [%s]" % (i, d['message'],  client.id)
+            print "%d: Got %s from [%s]" % (i, d['message'], client.id)
             yield sleep_async(1)
+
 
 class ReplyHandler(object):
     @staticmethod
     def run(client, data):
         random.seed()
-        yield sleep_async(random.randint(0,3))
+        yield sleep_async(random.randint(0, 3))
         client.send('Reply to %s' % client.id)
 
 
 class ReplyHandlerErr(object):
     @staticmethod
     def run(client, data):
-	ggr
         random.seed()
-        yield sleep_async(random.randint(0,3))
+        yield sleep_async(random.randint(0, 3))
         client.send('Reply to %s' % client.id)
 
 
 class ReplyHandlerErr2(object):
     @staticmethod
     def run(client, data):
-	ggr
+        ggr
         random.seed()
         client.send('Reply to %s' % client.id)
 
@@ -63,7 +66,7 @@ class ReplyHandler2(object):
     @staticmethod
     def run(client, data):
         random.seed()
-        yield sleep_async(5+random.randint(0,5))
+        yield sleep_async(5 + random.randint(0, 5))
         client.send('Reply to %s' % client.id)
 
 
@@ -71,7 +74,7 @@ class ReplyHandler3(object):
     @staticmethod
     def run(client, data):
         random.seed()
-        yield sleep_async(15+random.randint(0,5))
+        yield sleep_async(15 + random.randint(0, 5))
         client.send('Reply to %s' % client.id)
 
 
@@ -79,4 +82,3 @@ class ReplyHandlerEchoNoWait(object):
     @staticmethod
     def run(client, data):
         client.send('Reply to %s' % client.id)
-

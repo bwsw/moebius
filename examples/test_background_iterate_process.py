@@ -1,8 +1,9 @@
 import sys
 sys.path.append("..")
 
-from moebius import *
-from test import *
+import time
+import zmq
+import moebius
 from multiprocessing import Process
 
 
@@ -13,9 +14,10 @@ def timer(timeout):
 
 
 def iterate_handler(client):
-	client.send('ping')
+        client.send('ping')
 
-class TestServer(ZMQServer):
+
+class TestServer(moebius.ZMQServer):
     def background(self, connection):
         while True:
             connection.iterate(iterate_handler)
@@ -23,7 +25,7 @@ class TestServer(ZMQServer):
 
 
 def start_server(port):
-    router = ZMQRouter([])
+    router = moebius.ZMQRouter([])
     srv = TestServer('tcp://127.0.0.1:%s' % port, router)
     print 'Server started'
     srv.start()

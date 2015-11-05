@@ -8,37 +8,36 @@ sys.path.append("..")
 
 import multiprocessing
 import time
-import zmq
 import json
 import handlers
-from   zmq.eventloop import ioloop, zmqstream
-from   Queue import Queue
-from   moebius import *
+import moebius
 
 import logging
 import sys
 import os
+from moebius.constants import STRATEGY_QUEUE
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+
 
 #-------------------------------------------------------------
 # specific client which is derived from basic REQ/REP client
 #
-class Client(utils.YieldingClient):
+class Client(moebius.utils.YieldingClient):
     def send(self, message):
         super(Client, self).send(message=message)
 
     def run(self, message):
-	logging.debug("Entering Client.run - %s" % os.getpid())
-	self.send(message)
-	logging.debug("Sent msg at Client.run - %s" % os.getpid())
-	for i in self.wait_result_async():
-		time.sleep(1)
-	if self.data is None:
-		print "Failed to wait"
-	data = self.recv_no_wait()
-	print "Data is: %s" % data
-	return data
+        logging.debug("Entering Client.run - %s" % os.getpid())
+        self.send(message)
+        logging.debug("Sent msg at Client.run - %s" % os.getpid())
+        for i in self.wait_result_async():
+                time.sleep(1)
+        if self.data is None:
+                print "Failed to wait"
+        data = self.recv_no_wait()
+        print "Data is: %s" % data
+        return data
 
 
 def start_server(port):
@@ -49,14 +48,14 @@ def start_server(port):
             'handler': (STRATEGY_QUEUE, handlers.ReplyHandler3)
         }
     ]
-    router = ZMQRouter(rules)
-    broom = Broom(
-		classname = ZMQServer, 
-		router = router, 
-		workers = 40, 
-		tmpdir = "tmp")
+    router = moebius.ZMQRouter(rules)
+    broom = moebius.Broom(
+        classname=moebius.ZMQServer,
+        router=router,
+        workers=40,
+        tmpdir="tmp")
 
-    srv = BroomServer('tcp://127.0.0.1:%s' % port, broom, 1)
+    srv = moebius.BroomServer('tcp://127.0.0.1:%s' % port, broom, 1)
     print 'Server created'
     srv.start()
 
@@ -84,16 +83,16 @@ if __name__ == "__main__":
     time.sleep(2)
 
     for i in xrange(10):
-        child.append(multiprocessing.Process(target=start_sync_client, args=(port, i,)))
-	child[i].start()
+        child.append(multiprocessing.Process(
+            target=start_sync_client,
+            args=(port, i,)))
+        child[i].start()
 
     for i in xrange(10):
-	child[i].join()
-
+        child[i].join()
 
     #c = multiprocessing.Process(target=start_sync_client, args=(port, 1))
     #c.start()
     #c.join()
 
     s.terminate()
-

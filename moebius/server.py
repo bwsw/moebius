@@ -2,9 +2,12 @@ import zmq
 import types
 import itertools
 import logging
-from constants import *
 from connection import ZMQConnection
-from errors import *
+from constants import STRATEGY_REPLACE, STRATEGY_IGNORE, STRATEGY_QUEUE
+from errors import \
+    UnknownStrategyError, \
+    HandlerProcessingError, \
+    RouterProcessingError
 
 
 class ZMQServer(object):
@@ -14,10 +17,10 @@ class ZMQServer(object):
     _socket_ids = set()
     _connections = dict()
 
-    def __init__(self, address, router, poll_wait = 5):
+    def __init__(self, address, router, poll_wait=5):
         self._address = address
         self._router = router
-	self._poll_wait = poll_wait
+        self._poll_wait = poll_wait
 
     def _handle_request(self, connection):
         client, message = connection.process()
@@ -27,16 +30,21 @@ class ZMQServer(object):
             return
 
         try:
-            strategy, handler = self._router.process(message = message)
+            strategy, handler = self._router.process(message=message)
 
             if client.id not in self._generator_dictionary:
-		try:
-			res = handler.run(client, message)
-			self._generator_dictionary[client.id] = res
-		except Exception as e:
-			self.on_exception_msg(client.id, message, e)
+                try:
+                        res = handler.run(client, message)
+                        self._generator_dictionary[client.id] = res
+                except Exception as e:
+                        self.on_exception_msg(client.id, message, e)
 
-                if (client.id in self._generator_dictionary) and not isinstance(self._generator_dictionary[client.id], types.GeneratorType):
+                if (
+                        client.id in self._generator_dictionary and
+                        not isinstance(
+                            self._generator_dictionary[client.id],
+                            types.GeneratorType)
+                ):
                     del self._generator_dictionary[client.id]
                 else:
                     self._poll_forever = False
@@ -44,28 +52,31 @@ class ZMQServer(object):
             else:
                 if strategy == STRATEGY_REPLACE:
 
-		    try:
-			res = handler.run(client, message)
-            		if isinstance(res, types.GeneratorType):
-                		self._generator_dictionary[client.id] = res
-		    except Exception as e:
-			self.on_exception_msg(client.id, message, e)
+                    try:
+                        res = handler.run(client, message)
+                        if isinstance(res, types.GeneratorType):
+                                self._generator_dictionary[client.id] = res
+                    except Exception as e:
+                        self.on_exception_msg(client.id, message, e)
 
                 elif strategy == STRATEGY_QUEUE:
 
-		    current_q = self._generator_dictionary[client.id]
-		    try:
-			res = handler.run(client, message)
-            		if isinstance(res, types.GeneratorType):
-                		self._generator_dictionary[client.id] = itertools.chain(self._generator_dictionary[client.id], res)
-		    except Exception as e:
-			self._generator_dictionary[client.id] = current_q
-			self.on_exception_msg(client.id, message, e)
+                    current_q = self._generator_dictionary[client.id]
+                    try:
+                        res = handler.run(client, message)
+                        if isinstance(res, types.GeneratorType):
+                            self._generator_dictionary[client.id] = \
+                                itertools.chain(
+                                    self._generator_dictionary[client.id], res)
+                    except Exception as e:
+                        self._generator_dictionary[client.id] = current_q
+                        self.on_exception_msg(client.id, message, e)
 
                 elif strategy == STRATEGY_IGNORE:
                     pass
                 else:
-                    raise UnknownStrategyError('Unknown strategy')
+                    raise UnknownStrategyError(
+                        'Unknown strategy: "{}"'.format(strategy))
         except HandlerProcessingError, e:
             if client.id in self._generator_dictionary:
                 del self._generator_dictionary[client.id]
@@ -83,15 +94,15 @@ class ZMQServer(object):
             try:
                 result = self._generator_dictionary[clt].next()
 
-		# if iteration result is generator, then chain it
+                # if iteration result is generator, then chain it
                 if isinstance(result, types.GeneratorType):
-                    self._generator_dictionary[clt] = itertools.chain(result,
-                                                                        self._generator_dictionary[clt])
+                    self._generator_dictionary[clt] = itertools.chain(
+                        result, self._generator_dictionary[clt])
             except StopIteration:
                 mark_delete.append(clt)
-	    except Exception as e:
+            except Exception as e:
                 mark_delete.append(clt)
-		self.on_exception_next(clt, self._generator_dictionary[clt], e)
+                self.on_exception_next(clt, self._generator_dictionary[clt], e)
 
         for generator_to_delete in mark_delete:
             del self._generator_dictionary[generator_to_delete]
@@ -107,7 +118,8 @@ class ZMQServer(object):
         try:
             background_process = self.background(connection)
             if isinstance(background_process, types.GeneratorType):
-                self._generator_dictionary['__background_process_'] = background_process
+                self._generator_dictionary['__background_process_'] = \
+                    background_process
                 self._poll_forever = False
         except AttributeError:
             pass
@@ -125,7 +137,7 @@ class ZMQServer(object):
                         self._handle_request(self._connections[socket_id])
                 self._handle_generators()
         except KeyboardInterrupt:
-	    logging.error('Stopped by keyboard interruption')
+            logging.error('Stopped by keyboard interruption')
         except:
             raise
 
@@ -137,20 +149,20 @@ class ZMQServer(object):
         pass
 
     def on_exception_msg(self, client, message, e):
-	logging.error("Message processing error occured ----------------")
-	logging.error("Client ID: %s" 	% client)
-	logging.error("Message: %s" 	% message)
-	logging.error("Exception: %s" 	% e)
-	logging.error("-------------------------------------------------")
+        logging.error("Message processing error occured ----------------")
+        logging.error("Client ID: %s" % client)
+        logging.error("Message: %s" % message)
+        logging.error("Exception: %s" % e)
+        logging.error("-------------------------------------------------")
 
-    
-    def on_exception_next(self,client, gen, e):
-	logging.error("Next iteration error occured. Generator wiil be removed ")
-	logging.error("Client ID: %s" 	% client)
-	logging.error("Generator is: %s" % gen)
-	logging.error("Exception: %s" 	% e)
-	logging.error("--------------------------------------------------------")
-
+    def on_exception_next(self, client, gen, e):
+        logging.error(
+            "Next iteration error occured. Generator wiil be removed ")
+        logging.error("Client ID: %s" % client)
+        logging.error("Generator is: %s" % gen)
+        logging.error("Exception: %s" % e)
+        logging.error(
+            "--------------------------------------------------------")
 
     @staticmethod
     def error_handler(exception, client):
