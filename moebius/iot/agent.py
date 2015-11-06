@@ -68,12 +68,15 @@ class BasicAgentRouter(ZMQRouter):
 		try:
 			return super(BasicAgentRouter, self).process(**kwargs)
 		except Exception as e:
+			debug("---------------------------------------------------")
 			debug(e)
 			try:
 				return self._agent_router.process(**kwargs)
-			except RouterProcessingError as e:
+			except Exception as e:
+				debug("---------------------------------------------------")
+				debug(e)
 				return (STRATEGY_QUEUE, BSA_NotImplementedHandler)
-	
+
 		
 		
 class BasicServiceAgent(ZMQServer):

@@ -75,7 +75,7 @@ class ReplyHandler3(Handler):
     @staticmethod
     def run(client, data):
         random.seed()
-        yield sleep_async(15 + random.randint(0, 5))
+        yield sleep_async(3 + random.randint(0, 5))
         client.send('Reply to %s' % client.id)
 
 

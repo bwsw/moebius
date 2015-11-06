@@ -17,7 +17,7 @@ import sys
 import os
 from moebius.constants import STRATEGY_QUEUE
 
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
 #-------------------------------------------------------------
@@ -41,7 +41,7 @@ class Client(moebius.utils.YieldingClient):
 
 
 def start_server(port):
-
+    logging.debug("PID: %d, PPID: %d" % (os.getpid(), os.getppid()))
     rules = [
         {
             'command': 'reply',
@@ -52,8 +52,9 @@ def start_server(port):
     broom = moebius.Broom(
         classname=moebius.ZMQServer,
         router=router,
-        workers=40,
+        workers=5,
         tmpdir="tmp")
+    broom.run()
 
     srv = moebius.BroomServer('tcp://127.0.0.1:%s' % port, broom, 1)
     print 'Server created'
@@ -61,6 +62,7 @@ def start_server(port):
 
 
 def start_sync_client(port, id):
+    logging.debug("PID: %d, PPID: %d" % (os.getpid(), os.getppid()))
     cl = Client(
         address='tcp://127.0.0.1:%s' % port,
         identity='Client%s' % id
@@ -76,19 +78,19 @@ def start_sync_client(port, id):
 
 if __name__ == "__main__":
     port = 19876
+    logging.debug("PID: %d, PPID: %d" % (os.getpid(), os.getppid()))
     s = multiprocessing.Process(target=start_server, args=(port,))
     s.start()
     child = []
-
     time.sleep(2)
-
-    for i in xrange(10):
+    children = 10
+    for i in xrange(children):
         child.append(multiprocessing.Process(
             target=start_sync_client,
             args=(port, i,)))
         child[i].start()
 
-    for i in xrange(10):
+    for i in xrange(children):
         child[i].join()
 
     #c = multiprocessing.Process(target=start_sync_client, args=(port, 1))

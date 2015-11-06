@@ -6,33 +6,50 @@ import random
 from constants import STRATEGY_QUEUE
 from server import ZMQServer
 from router import ZMQRouter
-from utils import YieldingClient
+from utils import YieldingClient, sleep_async
+
+
+def exit_checker(obj):
+    parent_pid = os.getppid()
+    while True:
+        logging.debug("Background PID: %d, PPID: %d, %s" %
+                      (os.getpid(), os.getppid(), obj.__class__.__name__))
+            # check if died                                                                                                                                               
+        if os.kill(os.getppid(), 0) or os.getppid() <> parent_pid:
+            logging.debug("Parent is offline PID: %d, PPID: %d" %
+                          (os.getpid(), parent_pid))
+            # died, then exit                                                                                                                                         
+            exit(0)
+
+        yield sleep_async(1)
 
 
 #-------------------------------------------------------------
 # broom proxy
 #
 class BroomHandler(object):
-        @staticmethod
-        def run(client, data):
-                logging.debug("Entering BroomHandler.run")
-                broom = client.connection.server.broom
-                broom.run()
-                r = broom.relay(client, data)
-                logging.debug("BroomHandler.run - relay is %s" % r)
-                logging.debug("Leaving BroomHandler.run")
-                return r
+
+    @staticmethod
+    def run(client, data):
+        logging.debug("Entering BroomHandler.run")
+        broom = client.connection.server.broom
+        # broom.run()
+        r = broom.relay(client, data)
+        logging.debug("BroomHandler.run - relay is %s" % r)
+        logging.debug("Leaving BroomHandler.run")
+        return r
 
 
 #-------------------------------------------------------------
 # broom proxy router class. Always sends messages to BroomHandler
 #
 class BroomProxyRouter(ZMQRouter):
-        def __init__(self):
-                super(BroomProxyRouter, self).__init__(None)
 
-        def process(self, **kwargs):
-                return (STRATEGY_QUEUE, BroomHandler)
+    def __init__(self):
+        super(BroomProxyRouter, self).__init__(None)
+
+    def process(self, **kwargs):
+        return (STRATEGY_QUEUE, BroomHandler)
 
 
 #-------------------------------------------------------------
@@ -65,89 +82,96 @@ class BroomClient(YieldingClient):
 # broom
 #
 class Broom(object):
-        def __init__(self, *args, **kwargs):
-                logging.debug("Entering Broom.__init__")
-                self._classname = kwargs["classname"]
-                self._router = kwargs["router"]
-                self._cnt = kwargs["workers"]
-                self._tmpdir = kwargs["tmpdir"].rstrip("/")
-                self._is_run = False
-                logging.debug("Leaving Broom.__init__")
 
-        def run(self):
-                logging.debug("Entering Broom.run")
-                if self._is_run:
-                        logging.debug("Leaving Broom.run - already run")
-                        return
+    def __init__(self, *args, **kwargs):
+        logging.debug("Entering Broom.__init__")
+        self._classname = kwargs["classname"]
+        self._router = kwargs["router"]
+        self._cnt = kwargs["workers"]
+        self._tmpdir = kwargs["tmpdir"].rstrip("/")
+        self._is_run = False
+        logging.debug("Leaving Broom.__init__")
 
-                random.seed()
-                # function to launch server
-                logging.debug("Broom.run - create mq")
-                q = multiprocessing.Queue()
+    def run(self):
+        logging.debug("Entering Broom.run")
+        if self._is_run:
+            logging.debug("Leaving Broom.run - already run")
+            return
 
-                logging.debug("Broom.run - create _start_server handler")
+        random.seed()
+        # function to launch server
+        logging.debug("Broom.run - create mq")
+        q = multiprocessing.Queue()
 
-                def _start_server(q):
-                        logging.debug("Entering Broom.run._start_server")
-                        path = 'ipc:///%s/%s-%s.sock' % (
-                            self._tmpdir, os.getpid(), time.time())
-                        srv = self._classname(path, self._router, 1)
-                        q.put(path)
-                        logging.debug("Lauching Broom svr %s / %s" % (
-                            self._classname, path))
-                        srv.start()
+        logging.debug("Broom.run - create _start_server handler")
 
-                # run all processes
-                logging.debug("Broom.run - launching worker processes")
-                self.processes = []
-                for i in xrange(self._cnt):
-                        p = multiprocessing.Process(
-                            target=_start_server, args=(q,))
-                        p.start()
-                        self.processes.append(p)
-                # gather path from all processes
-                logging.debug("Broom.run - receiving worker sockets")
-                self._workers = []
-                for p in self.processes:
-                        sock = q.get()
-                        self._workers.append(sock)
-                        logging.debug(
-                            "Broom.run - receiving worker socket %s" % sock)
-                self._is_run = True
-                logging.debug("Leaving Broom.run - completed")
+        def _start_server(q):
+            logging.debug("PID: %d, PPID: %d" % (os.getpid(), os.getppid()))
+            logging.debug("Entering Broom.run._start_server")
+            path = 'ipc:///%s/%s-%s.sock' % (
+                self._tmpdir, os.getpid(), time.time())
+            srv = self._classname(path, self._router, 1)
+            q.put(path)
+            logging.debug("Lauching Broom svr %s / %s" % (
+                self._classname, path))
+            srv.add_background_generator(exit_checker(srv))
+            srv.start()
 
-        def shutdown(self):
-                for p in self.processes:
-                        p.terminate()
+        # run all processes
+        logging.debug("Broom.run - launching worker processes")
+        self.processes = []
+        for i in xrange(self._cnt):
+            p = multiprocessing.Process(
+                target=_start_server, args=(q,))
+            p.start()
+            self.processes.append(p)
+        # gather path from all processes
+        logging.debug("Broom.run - receiving worker sockets")
+        self._workers = []
+        for p in self.processes:
+            sock = q.get()
+            self._workers.append(sock)
+            logging.debug(
+                "Broom.run - receiving worker socket %s" % sock)
+        self._is_run = True
+        logging.debug("Leaving Broom.run - completed")
 
-        def relay(self, clt, command):
-                logging.debug(
-                    "Entering Broom.relay with command '%s'" % command)
-                broom_clt = "%010d" % random.randint(0, 100000000)
-                logging.debug("Broom.relay - generate id '%s'" % broom_clt)
+    def shutdown(self):
+        for p in self.processes:
+            p.terminate()
 
-                c = BroomClient(
-                    address=random.choice(self._workers),
-                    identity=broom_clt,
-                    src_client=clt)
+    def relay(self, clt, command):
+        logging.debug(
+            "Entering Broom.relay with command '%s'" % command)
+        broom_clt = "%010d" % random.randint(0, 100000000)
+        logging.debug("Broom.relay - generate id '%s'" % broom_clt)
 
-                c.connect()
-                logging.debug("Broom.relay - send command to %s : %s" % (
-                    clt, command))
-                c.send(command)
-                logging.debug("Leaving Broom.relay")
-                return c.wait_result_async()
+        c = BroomClient(
+            address=random.choice(self._workers),
+            identity=broom_clt,
+            src_client=clt)
 
+        c.connect()
+        logging.debug("Broom.relay - send command to %s : %s" % (
+            clt, command))
+        c.send(command)
+        logging.debug("Leaving Broom.relay")
+        return c.wait_result_async()
 
 #-------------------------------------------------------------
 # broom proxy server class. Always relays messages to broom
 #
 class BroomServer(ZMQServer):
-        def __init__(self, address, broom, poll_wait=1):
-                router = BroomProxyRouter()
-                super(BroomServer, self).__init__(address, router, poll_wait)
-                self._broom = broom
 
-        @property
-        def broom(self):
-                return self._broom
+    def __init__(self, address, broom, poll_wait=1):
+        router = BroomProxyRouter()
+        super(BroomServer, self).__init__(address, router, poll_wait)
+        self._broom = broom
+
+    @property
+    def broom(self):
+        return self._broom
+
+    def background(self, connection):
+        return exit_checker(self)
+

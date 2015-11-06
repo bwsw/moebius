@@ -2,6 +2,7 @@ import zmq
 import types
 import itertools
 import logging
+import uuid
 from connection import ZMQConnection
 from constants import STRATEGY_REPLACE, STRATEGY_IGNORE, STRATEGY_QUEUE
 from errors import \
@@ -177,3 +178,6 @@ class ZMQServer(object):
     @property
     def address(self):
         return self._address
+
+    def add_background_generator(self, generator):
+        self._generator_dictionary[uuid.uuid4()] = generator
