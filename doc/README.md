@@ -27,7 +27,10 @@ Moebius allows to use two types of handlers:
 Python function shoud be used when You need just to do something right now and reply back to client. It could be expressed like written in example below:
 
 ```python
-class FunctionHandler(object):
+
+from moebius.server import Handler
+
+class FunctionHandler(Handler):
     @staticmethod
     def run(client, data):
         client.send('Hello, world')
@@ -41,7 +44,9 @@ Next, you could se generator handler which sends back to client 3000 messages.
 
 ```python
 
-class GeneratorHandler(object):
+from moebius.server import Handler
+
+class GeneratorHandler(Handler):
     @staticmethod
     def run(client, data):
         for i in range(30000):
@@ -53,7 +58,9 @@ It's implemented as generator (not as function) because it should give another c
 
 ```python
 
-class GeneratorHandler(object):
+from moebius.server import Handler
+
+class GeneratorHandler(Handler):
     @staticmethod
     def run(client, data):
         for i in range(30000):
@@ -66,8 +73,9 @@ Let's move forward and learn how to implement non-blocking sleep using generator
 ```python
 
 import moebius.utils
+from moebius.server import Handler
 
-class SleepGeneratorHandler(object):
+class SleepGeneratorHandler(Handler):
     @staticmethod
     def run(client, data):
         d = json.loads(data)
@@ -293,6 +301,29 @@ class TestServer(ZMQServer):
             connection.iterate(iterate_handler)
             yield timer(1)
 
+```
+
+### Registering additional background tasks
+
+To register additional background tasks you can use next technique from program scope:
+
+```python
+
+srv = moebius.ZMQServer('tcp://127.0.0.1:%s' % port, router)
+srv.add_background_handler(generator1(arg11,arg12,arg13))
+srv.add_background_handler(generator2(arg21,arg22,arg23))
+srv.start()
+
+```
+
+or using ```client.connection.server``` from Handler.run scope:
+
+```python
+class MyHandler(Handler):
+	@staticmethod
+	def run(client, data)
+   		client.connection.server.add_background_handler(generator2(arg21,arg22,arg23))
+   		...
 ```
 
 ## Exception handling
