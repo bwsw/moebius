@@ -5,6 +5,8 @@ import logging
 from zmq.eventloop import ioloop, zmqstream
 #from moebius import *
 
+logger = logging.getLogger(__name__)
+
 ioloop.install()
 
 
@@ -76,15 +78,15 @@ class YieldingClient(object):
     _socket = None
 
     def __init__(self, *args, **kwargs):
-        logging.debug("Entering YieldingClient.__init__ - %s" % os.getpid())
+        logger.debug("Entering YieldingClient.__init__ - %s" % os.getpid())
         self._address = kwargs['address']
         self._data = None
         self._socket_type = kwargs.pop('socket_type', zmq.DEALER)
         self._identity = kwargs.pop('identity', None)
-        logging.debug("YieldingClient.__init__ - creating poller - %s" % (
+        logger.debug("YieldingClient.__init__ - creating poller - %s" % (
             os.getpid(), ))
         self._poller = zmq.Poller()
-        logging.debug("Leaving YieldingClient.__init__ %s" % os.getpid())
+        logger.debug("Leaving YieldingClient.__init__ %s" % os.getpid())
 
     def connect(self):
         context = zmq.Context()
@@ -107,7 +109,7 @@ class YieldingClient(object):
         pass
 
     def wait_result_async(self, timeout=None):
-        logging.debug("Entering YieldingClient.wait_result_async - %s" % (
+        logger.debug("Entering YieldingClient.wait_result_async - %s" % (
             os.getpid()))
         t = time.time()
         self._data = None

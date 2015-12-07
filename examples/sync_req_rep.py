@@ -14,6 +14,7 @@ import moebius
 from moebius.constants import STRATEGY_QUEUE
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+logger = logging.getLogger(__name__)
 
 
 #-------------------------------------------------------------
@@ -29,7 +30,7 @@ class Client(moebius.utils.ReqRepClient):
 
 
 def start_server(port):
-    debug("PID: %d, PPID: %d" % (os.getpid(), os.getppid()))
+    logger.debug("PID: %d, PPID: %d" % (os.getpid(), os.getppid()))
     rules = [
         {
             'command': 'reply',
@@ -43,7 +44,7 @@ def start_server(port):
 
 
 def start_sync_client_strategy(port, id):
-    debug("PID: %d, PPID: %d" % (os.getpid(), os.getppid()))
+    logger.debug("PID: %d, PPID: %d" % (os.getpid(), os.getppid()))
     cl = Client(
         address='tcp://127.0.0.1:%s' % port,
         identity='Client%s' % id
@@ -58,7 +59,7 @@ def start_sync_client_strategy(port, id):
 
 
 if __name__ == "__main__":
-    debug("PID: %d, PPID: %d" % (os.getpid(), os.getppid()))
+    logger.debug("PID: %d, PPID: %d" % (os.getpid(), os.getppid()))
     port = 19876
     s = multiprocessing.Process(target=start_server, args=(port,))
     s.start()
