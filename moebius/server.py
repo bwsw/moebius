@@ -10,6 +10,8 @@ from errors import \
     HandlerProcessingError, \
     RouterProcessingError
 
+logger = logging.getLogger(__name__)
+
 class Handler(object):
     @staticmethod
     def run(client, data):
@@ -142,7 +144,7 @@ class ZMQServer(object):
                         self._handle_request(self._connections[socket_id])
                 self._handle_generators()
         except KeyboardInterrupt:
-            logging.error('Stopped by keyboard interruption')
+            logger.error('Stopped by keyboard interruption')
         except:
             raise
 
@@ -154,19 +156,19 @@ class ZMQServer(object):
         pass
 
     def on_exception_msg(self, client, message, e):
-        logging.error("Message processing error occured ----------------")
-        logging.error("Client ID: %s" % client)
-        logging.error("Message: %s" % message)
-        logging.error("Exception: %s" % e)
-        logging.error("-------------------------------------------------")
+        logger.error("Message processing error occured ----------------")
+        logger.error("Client ID: %s" % client)
+        logger.error("Message: %s" % message)
+        logger.error("Exception: %s" % e)
+        logger.error("-------------------------------------------------")
 
     def on_exception_next(self, client, gen, e):
-        logging.error(
+        logger.error(
             "Next iteration error occured. Generator wiil be removed ")
-        logging.error("Client ID: %s" % client)
-        logging.error("Generator is: %s" % gen)
-        logging.error("Exception: %s" % e)
-        logging.error(
+        logger.error("Client ID: %s" % client)
+        logger.error("Generator is: %s" % gen)
+        logger.error("Exception: %s" % e)
+        logger.error(
             "--------------------------------------------------------")
 
     @staticmethod
